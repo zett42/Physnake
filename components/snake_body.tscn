@@ -1,0 +1,45 @@
+[gd_scene load_steps=5 format=3 uid="uid://cak8su76sfgpk"]
+
+[ext_resource type="Script" path="res://components/snake_body.gd" id="1_hlygk"]
+[ext_resource type="ArrayMesh" uid="uid://4chd576mg2xc" path="res://mesh/circle_48seg.obj" id="2_i0xoc"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_kke47"]
+radius = 12.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_it4ar"]
+radius = 18.0
+
+[node name="SnakeBody" type="RigidBody2D" groups=["apply_explosion", "snake", "snake_body"]]
+mass = 0.01
+linear_damp = 2.0
+script = ExtResource("1_hlygk")
+
+[node name="Mesh_normal" type="MeshInstance2D" parent="."]
+self_modulate = Color(0.158472, 0.158472, 0.158472, 1)
+position = Vector2(-2.38419e-07, -1.49012e-08)
+scale = Vector2(0.24, 0.24)
+mesh = ExtResource("2_i0xoc")
+
+[node name="Fill" type="MeshInstance2D" parent="Mesh_normal"]
+self_modulate = Color(1, 0.815686, 0, 1)
+scale = Vector2(0.8, 0.8)
+mesh = ExtResource("2_i0xoc")
+
+[node name="Mesh_big" type="MeshInstance2D" parent="."]
+visible = false
+self_modulate = Color(0.158472, 0.158472, 0.158472, 1)
+position = Vector2(-2.38419e-07, -1.49012e-08)
+scale = Vector2(0.36, 0.36)
+mesh = ExtResource("2_i0xoc")
+
+[node name="Fill" type="MeshInstance2D" parent="Mesh_big"]
+self_modulate = Color(1, 0.815686, 0, 1)
+scale = Vector2(0.86, 0.86)
+mesh = ExtResource("2_i0xoc")
+
+[node name="CollisionShape_normal" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_kke47")
+
+[node name="CollisionShape_big" type="CollisionShape2D" parent="."]
+visible = false
+shape = SubResource("CircleShape2D_it4ar")

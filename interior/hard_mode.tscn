@@ -1,0 +1,188 @@
+[gd_scene load_steps=4 format=3 uid="uid://m4k0w3uk55cj"]
+
+[ext_resource type="PackedScene" uid="uid://331f06pw233k" path="res://components/obstacle.tscn" id="1_21b81"]
+[ext_resource type="PackedScene" uid="uid://dp262jjjt8nxd" path="res://components/snake_head.tscn" id="2_7q88p"]
+[ext_resource type="PackedScene" uid="uid://bnhafpa1t4c2e" path="res://components/friendly_obstacle.tscn" id="3_mlu37"]
+
+[node name="Interior" type="Node2D"]
+
+[node name="Obstacle1" parent="." instance=ExtResource("1_21b81")]
+modulate = Color(0.909804, 0.0823529, 0.0823529, 1)
+position = Vector2(290, 183)
+
+[node name="Obstacle2" parent="." instance=ExtResource("1_21b81")]
+modulate = Color(0.553227, 0.0736, 0.92, 1)
+position = Vector2(596, 319)
+
+[node name="Obstacle3" parent="." instance=ExtResource("1_21b81")]
+modulate = Color(0.921569, 0.0745098, 0.596078, 1)
+position = Vector2(912, 158)
+
+[node name="Obstacle4" parent="." instance=ExtResource("1_21b81")]
+modulate = Color(0.341176, 0.0784314, 1, 1)
+position = Vector2(955, 502)
+
+[node name="Obstacle5" parent="." instance=ExtResource("1_21b81")]
+modulate = Color(0.862745, 0.0745098, 0.921569, 1)
+position = Vector2(222, 499)
+
+[node name="BottomObstacles" type="Node2D" parent="." groups=["hard_mode"]]
+modulate = Color(0, 0.882353, 1, 1)
+position = Vector2(0, 4)
+
+[node name="Obstacle1" parent="BottomObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(20, 627)
+obstacle_size = 0
+
+[node name="Obstacle3" parent="BottomObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(113, 627)
+obstacle_size = 0
+
+[node name="Obstacle5" parent="BottomObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(205, 627)
+obstacle_size = 0
+
+[node name="Obstacle7" parent="BottomObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(298, 627)
+obstacle_size = 0
+
+[node name="Obstacle9" parent="BottomObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(390, 627)
+obstacle_size = 0
+
+[node name="Obstacle11" parent="BottomObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(483, 627)
+obstacle_size = 0
+
+[node name="Obstacle13" parent="BottomObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(575, 627)
+obstacle_size = 0
+
+[node name="Obstacle15" parent="BottomObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(668, 627)
+obstacle_size = 0
+
+[node name="Obstacle17" parent="BottomObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(759, 627)
+obstacle_size = 0
+
+[node name="Obstacle19" parent="BottomObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(852, 627)
+obstacle_size = 0
+
+[node name="Obstacle21" parent="BottomObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(944, 627)
+obstacle_size = 0
+
+[node name="Obstacle23" parent="BottomObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(1037, 627)
+obstacle_size = 0
+
+[node name="Obstacle25" parent="BottomObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(1129, 627)
+obstacle_size = 0
+
+[node name="TopObstacles" type="Node2D" parent="." groups=["hard_mode"]]
+modulate = Color(0, 0.882353, 1, 1)
+position = Vector2(0, -610)
+
+[node name="Obstacle1" parent="TopObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(20, 651)
+obstacle_size = 0
+
+[node name="Obstacle3" parent="TopObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(113, 651)
+obstacle_size = 0
+
+[node name="Obstacle5" parent="TopObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(205, 651)
+obstacle_size = 0
+
+[node name="Obstacle7" parent="TopObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(298, 627)
+obstacle_size = 0
+
+[node name="Obstacle9" parent="TopObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(390, 627)
+obstacle_size = 0
+
+[node name="Obstacle11" parent="TopObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(483, 627)
+obstacle_size = 0
+
+[node name="Obstacle13" parent="TopObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(575, 627)
+obstacle_size = 0
+
+[node name="Obstacle15" parent="TopObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(668, 627)
+obstacle_size = 0
+
+[node name="Obstacle17" parent="TopObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(759, 627)
+obstacle_size = 0
+
+[node name="Obstacle19" parent="TopObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(852, 627)
+obstacle_size = 0
+
+[node name="Obstacle21" parent="TopObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(944, 627)
+obstacle_size = 0
+
+[node name="Obstacle23" parent="TopObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(1037, 627)
+obstacle_size = 0
+
+[node name="Obstacle25" parent="TopObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(1129, 627)
+obstacle_size = 0
+
+[node name="LeftObstacles" type="Node2D" parent="." groups=["hard_mode"]]
+modulate = Color(0, 0.882353, 1, 1)
+position = Vector2(-611, 599)
+
+[node name="Obstacle2" parent="LeftObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(631, -455)
+obstacle_size = 0
+
+[node name="Obstacle3" parent="LeftObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(631, -90)
+obstacle_size = 0
+
+[node name="Obstacle4" parent="LeftObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(631, -345)
+obstacle_size = 0
+
+[node name="Obstacle5" parent="LeftObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(631, -210)
+obstacle_size = 0
+
+[node name="RightObstacles" type="Node2D" parent="." groups=["hard_mode"]]
+modulate = Color(0, 0.882353, 1, 1)
+position = Vector2(496, 599)
+
+[node name="Obstacle2" parent="RightObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(633, -467)
+obstacle_size = 0
+
+[node name="Obstacle3" parent="RightObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(633, -89)
+obstacle_size = 0
+
+[node name="Obstacle4" parent="RightObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(633, -346)
+obstacle_size = 0
+
+[node name="Obstacle5" parent="RightObstacles" instance=ExtResource("1_21b81")]
+position = Vector2(633, -210)
+obstacle_size = 0
+
+[node name="SnakeHead" parent="." instance=ExtResource("2_7q88p")]
+position = Vector2(498, 202)
+
+[node name="FriendlyObstacle1" parent="." instance=ExtResource("3_mlu37")]
+position = Vector2(369, 359)
+
+[node name="FriendlyObstacle2" parent="." instance=ExtResource("3_mlu37")]
+position = Vector2(844, 344)

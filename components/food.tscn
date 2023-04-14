@@ -1,0 +1,30 @@
+[gd_scene load_steps=5 format=3 uid="uid://dg28fa7njidmr"]
+
+[ext_resource type="Script" path="res://components/food.gd" id="1_f1o5r"]
+[ext_resource type="ArrayMesh" uid="uid://4chd576mg2xc" path="res://mesh/circle_48seg.obj" id="3_8ja3x"]
+[ext_resource type="Shape2D" uid="uid://byqfqg6j24gi7" path="res://components/food_collision_shape_normal.tres" id="4_l6x26"]
+[ext_resource type="Shape2D" uid="uid://b0xy0u51igvte" path="res://components/food_collision_shape_big.tres" id="5_t5j03"]
+
+[node name="Food" type="RigidBody2D" groups=["apply_explosion", "food"]]
+modulate = Color(0.235294, 1, 0, 1)
+mass = 0.05
+gravity_scale = 0.0
+script = ExtResource("1_f1o5r")
+
+[node name="Mesh_normal" type="MeshInstance2D" parent="."]
+visible = false
+position = Vector2(-2.86102e-06, -2.86102e-06)
+scale = Vector2(0.200038, 0.200038)
+mesh = ExtResource("3_8ja3x")
+
+[node name="Mesh_big" type="MeshInstance2D" parent="."]
+position = Vector2(-1.33485e-06, -2.86102e-06)
+scale = Vector2(0.300057, 0.300057)
+mesh = ExtResource("3_8ja3x")
+
+[node name="CollisionShape_normal" type="CollisionShape2D" parent="."]
+visible = false
+shape = ExtResource("4_l6x26")
+
+[node name="CollisionShape_big" type="CollisionShape2D" parent="."]
+shape = ExtResource("5_t5j03")

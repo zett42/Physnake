@@ -1,0 +1,88 @@
+[gd_scene load_steps=11 format=3 uid="uid://dhd4r7ulkmuy1"]
+
+[ext_resource type="Script" path="res://room.gd" id="1_kfr5q"]
+[ext_resource type="PackedScene" path="res://components/food_spawner.tscn" id="2_dv5o3"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_43je0"]
+bounce = 0.9
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_agl7t"]
+normal = Vector2(0, 1)
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_t58mm"]
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_7rb42"]
+normal = Vector2(1, 0)
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_nyewm"]
+bounce = 0.79
+
+[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_d5imf"]
+normal = Vector2(-1, 0)
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_8w162"]
+bounce = 0.9
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_68ae8"]
+size = Vector2(279, 25)
+
+[node name="Room" type="Node2D"]
+script = ExtResource("1_kfr5q")
+
+[node name="WallTop" type="StaticBody2D" parent="."]
+position = Vector2(556, 0)
+physics_material_override = SubResource("PhysicsMaterial_43je0")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WallTop"]
+shape = SubResource("WorldBoundaryShape2D_agl7t")
+
+[node name="WallBottom" type="StaticBody2D" parent="."]
+position = Vector2(556, 648)
+physics_material_override = SubResource("PhysicsMaterial_43je0")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WallBottom"]
+shape = SubResource("WorldBoundaryShape2D_t58mm")
+
+[node name="WallLeft" type="StaticBody2D" parent="."]
+position = Vector2(0, 323)
+physics_material_override = SubResource("PhysicsMaterial_43je0")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WallLeft"]
+shape = SubResource("WorldBoundaryShape2D_7rb42")
+
+[node name="WallRight" type="StaticBody2D" parent="."]
+position = Vector2(1152, 323)
+physics_material_override = SubResource("PhysicsMaterial_nyewm")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WallRight"]
+shape = SubResource("WorldBoundaryShape2D_d5imf")
+
+[node name="ScorePanel" type="StaticBody2D" parent="."]
+physics_material_override = SubResource("PhysicsMaterial_8w162")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ScorePanel"]
+position = Vector2(139.5, 12.5)
+shape = SubResource("RectangleShape2D_68ae8")
+
+[node name="Panel" type="Panel" parent="ScorePanel"]
+self_modulate = Color(1, 1, 1, 0.752941)
+offset_right = 278.0
+offset_bottom = 25.0
+
+[node name="Score" type="Label" parent="ScorePanel/Panel"]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 1.0
+offset_right = 120.0
+offset_bottom = 27.0
+text = "Score: 0"
+
+[node name="TimeBonus" type="Label" parent="ScorePanel/Panel"]
+layout_mode = 0
+offset_left = 116.0
+offset_top = 1.0
+offset_right = 242.0
+offset_bottom = 27.0
+text = "Time Bonus:"
+
+[node name="FoodSpawner" parent="." instance=ExtResource("2_dv5o3")]

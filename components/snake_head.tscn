@@ -1,0 +1,44 @@
+[gd_scene load_steps=7 format=3 uid="uid://dp262jjjt8nxd"]
+
+[ext_resource type="Script" path="res://components/snake_head.gd" id="1_mu00g"]
+[ext_resource type="ArrayMesh" uid="uid://6cqmd1u3b2bn" path="res://mesh/circle_64seg.obj" id="2_7bfhf"]
+[ext_resource type="ArrayMesh" uid="uid://4chd576mg2xc" path="res://mesh/circle_48seg.obj" id="2_pr61b"]
+[ext_resource type="AudioStream" uid="uid://cmw7b1ptnb5kn" path="res://sounds/eat.wav" id="3_pldhu"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_it4ar"]
+radius = 15.0
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_wtblp"]
+streams_count = 1
+stream_0/stream = ExtResource("3_pldhu")
+stream_0/weight = 1.0
+
+[node name="SnakeHead" type="RigidBody2D" groups=["apply_explosion", "snake", "snake_head"]]
+max_contacts_reported = 1
+contact_monitor = true
+can_sleep = false
+linear_damp = 4.0
+script = ExtResource("1_mu00g")
+
+[node name="Shape" type="MeshInstance2D" parent="."]
+self_modulate = Color(0.12, 0.12, 0.12, 1)
+position = Vector2(-2.38419e-07, -1.49012e-08)
+scale = Vector2(0.3, 0.3)
+mesh = ExtResource("2_7bfhf")
+
+[node name="Fill" type="MeshInstance2D" parent="Shape"]
+scale = Vector2(0.833333, 0.833333)
+mesh = ExtResource("2_7bfhf")
+
+[node name="Pupil" type="MeshInstance2D" parent="Shape/Fill"]
+self_modulate = Color(0, 0, 0, 1)
+scale = Vector2(0.36, 0.36)
+mesh = ExtResource("2_pr61b")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_it4ar")
+
+[node name="EatSound" type="AudioStreamPlayer2D" parent="."]
+stream = SubResource("AudioStreamRandomizer_wtblp")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

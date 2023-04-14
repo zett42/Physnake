@@ -1,0 +1,18 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://components/food_spawner.gd" id="1_i321b"]
+[ext_resource type="Shape2D" uid="uid://byqfqg6j24gi7" path="res://components/food_collision_shape_normal.tres" id="2_eyq35"]
+[ext_resource type="Shape2D" uid="uid://b0xy0u51igvte" path="res://components/food_collision_shape_big.tres" id="3_pucsy"]
+
+[node name="FoodSpawner" type="Node"]
+script = ExtResource("1_i321b")
+
+[node name="ShapeCast_normal" type="ShapeCast2D" parent="."]
+shape = ExtResource("2_eyq35")
+target_position = Vector2(0, 0)
+max_results = 1
+
+[node name="ShapeCast_big" type="ShapeCast2D" parent="."]
+shape = ExtResource("3_pucsy")
+target_position = Vector2(0, 0)
+max_results = 1

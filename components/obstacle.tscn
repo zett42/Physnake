@@ -1,0 +1,123 @@
+[gd_scene load_steps=13 format=3 uid="uid://331f06pw233k"]
+
+[ext_resource type="Script" path="res://components/obstacle.gd" id="1_igoch"]
+[ext_resource type="ArrayMesh" uid="uid://bui8esb1ht4wi" path="res://mesh/circle_32seg.obj" id="2_pwtf4"]
+[ext_resource type="ArrayMesh" uid="uid://c60p8kc3ekcy7" path="res://mesh/skull.obj" id="3_myw4d"]
+[ext_resource type="Texture2D" uid="uid://blfaw33phlfd5" path="res://sprites/explosion_particle.png" id="4_1iyxn"]
+[ext_resource type="ArrayMesh" uid="uid://4chd576mg2xc" path="res://mesh/circle_48seg.obj" id="4_t0weu"]
+[ext_resource type="AudioStream" uid="uid://cpcarwurx3yue" path="res://sounds/explosion.wav" id="5_5nfy0"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_25id5"]
+radius = 14.0357
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_khe3i"]
+radius = 29.0
+
+[sub_resource type="Gradient" id="Gradient_8g5ww"]
+interpolation_mode = 2
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_faeyo"]
+gradient = SubResource("Gradient_8g5ww")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_n6e4x"]
+lifetime_randomness = 0.15
+particle_flag_disable_z = true
+spread = 180.0
+gravity = Vector3(0, 0, 0)
+initial_velocity_min = 300.0
+initial_velocity_max = 700.0
+orbit_velocity_min = 0.0
+orbit_velocity_max = 0.0
+damping_min = 43.16
+damping_max = 75.79
+scale_max = 3.0
+color_ramp = SubResource("GradientTexture1D_faeyo")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_m7bki"]
+lifetime_randomness = 0.15
+particle_flag_disable_z = true
+spread = 180.0
+gravity = Vector3(0, 0, 0)
+initial_velocity_min = 300.0
+initial_velocity_max = 700.0
+orbit_velocity_min = 0.0
+orbit_velocity_max = 0.0
+damping_min = 43.16
+damping_max = 75.79
+scale_max = 3.0
+color_ramp = SubResource("GradientTexture1D_faeyo")
+
+[node name="Obstacle" type="RigidBody2D"]
+max_contacts_reported = 1
+contact_monitor = true
+freeze = true
+freeze_mode = 1
+script = ExtResource("1_igoch")
+
+[node name="Mesh_small" type="MeshInstance2D" parent="."]
+visible = false
+self_modulate = Color(0.158472, 0.158472, 0.158472, 1)
+scale = Vector2(0.28, 0.28)
+mesh = ExtResource("2_pwtf4")
+
+[node name="Fill" type="MeshInstance2D" parent="Mesh_small"]
+scale = Vector2(0.8, 0.8)
+mesh = ExtResource("2_pwtf4")
+
+[node name="Skull" type="MeshInstance2D" parent="Mesh_small"]
+self_modulate = Color(0, 0, 0, 1)
+position = Vector2(0, 1)
+scale = Vector2(0.667743, 0.667743)
+mesh = ExtResource("3_myw4d")
+
+[node name="Mesh_normal" type="MeshInstance2D" parent="."]
+self_modulate = Color(0.158472, 0.158472, 0.158472, 1)
+scale = Vector2(0.58, 0.58)
+mesh = ExtResource("4_t0weu")
+
+[node name="Fill" type="MeshInstance2D" parent="Mesh_normal"]
+scale = Vector2(0.9, 0.9)
+mesh = ExtResource("4_t0weu")
+
+[node name="Skull" type="MeshInstance2D" parent="Mesh_normal"]
+self_modulate = Color(0, 0, 0, 1)
+position = Vector2(-9.53674e-07, 1.72414)
+scale = Vector2(0.75, 0.75)
+mesh = ExtResource("3_myw4d")
+
+[node name="CollisionShape_small" type="CollisionShape2D" parent="."]
+visible = false
+shape = SubResource("CircleShape2D_25id5")
+disabled = true
+
+[node name="CollisionShape_normal" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_khe3i")
+
+[node name="ExplosionParticles_small" type="GPUParticles2D" parent="."]
+scale = Vector2(0.5, 0.5)
+emitting = false
+amount = 2000
+process_material = SubResource("ParticleProcessMaterial_n6e4x")
+texture = ExtResource("4_1iyxn")
+lifetime = 1.25
+one_shot = true
+preprocess = 0.35
+explosiveness = 0.71
+trail_lifetime = 0.2
+
+[node name="ExplosionParticles_normal" type="GPUParticles2D" parent="."]
+emitting = false
+amount = 3000
+process_material = SubResource("ParticleProcessMaterial_m7bki")
+texture = ExtResource("4_1iyxn")
+lifetime = 1.25
+one_shot = true
+preprocess = 0.35
+explosiveness = 0.71
+trail_lifetime = 0.2
+
+[node name="ExplosionSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("5_5nfy0")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

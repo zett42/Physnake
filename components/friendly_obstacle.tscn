@@ -1,0 +1,22 @@
+[gd_scene load_steps=3 format=3 uid="uid://bnhafpa1t4c2e"]
+
+[ext_resource type="ArrayMesh" uid="uid://4chd576mg2xc" path="res://mesh/circle_48seg.obj" id="1_tfups"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_mqjci"]
+radius = 18.0
+
+[node name="FriendlyObstacle" type="StaticBody2D"]
+position = Vector2(595, 332)
+
+[node name="Mesh" type="MeshInstance2D" parent="."]
+self_modulate = Color(0.12, 0.12, 0.12, 1)
+scale = Vector2(0.36, 0.36)
+mesh = ExtResource("1_tfups")
+
+[node name="Fill" type="MeshInstance2D" parent="Mesh"]
+self_modulate = Color(0.619608, 0.619608, 0.619608, 1)
+scale = Vector2(0.8, 0.8)
+mesh = ExtResource("1_tfups")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_mqjci")

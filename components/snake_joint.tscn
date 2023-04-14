@@ -1,0 +1,19 @@
+[gd_scene load_steps=2 format=3 uid="uid://c5fvr38o2bp78"]
+
+[ext_resource type="Script" path="res://components/snake_joint.gd" id="1_bw66t"]
+
+[node name="SnakeJoint" type="DampedSpringJoint2D" groups=["separable_joint"]]
+top_level = true
+disable_collision = false
+length = 30.0
+rest_length = 25.0
+damping = 0.1
+script = ExtResource("1_bw66t")
+
+[node name="Line" type="Line2D" parent="."]
+top_level = true
+z_index = -1
+points = PackedVector2Array(0, 0, 0, 0)
+width = 14.0
+default_color = Color(1, 0.815686, 0, 1)
+antialiased = true

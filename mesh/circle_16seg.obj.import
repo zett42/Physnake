@@ -1,0 +1,21 @@
+[remap]
+
+importer="wavefront_obj"
+importer_version=1
+type="Mesh"
+uid="uid://djk7ol0mhwxlj"
+path="res://.godot/imported/circle_16seg.obj-3f6c4fcc598ace400f7d2aaefbb2f9a6.mesh"
+
+[deps]
+
+files=["res://.godot/imported/circle_16seg.obj-3f6c4fcc598ace400f7d2aaefbb2f9a6.mesh"]
+
+source_file="res://mesh/circle_16seg.obj"
+dest_files=["res://.godot/imported/circle_16seg.obj-3f6c4fcc598ace400f7d2aaefbb2f9a6.mesh", "res://.godot/imported/circle_16seg.obj-3f6c4fcc598ace400f7d2aaefbb2f9a6.mesh"]
+
+[params]
+
+generate_tangents=true
+scale_mesh=Vector3(1, 1, 1)
+offset_mesh=Vector3(0, 0, 0)
+optimize_mesh=true

@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=3 uid="uid://vh6bdtlm7lve"]
+
+[ext_resource type="PackedScene" uid="uid://331f06pw233k" path="res://components/obstacle.tscn" id="1_vj1ox"]
+[ext_resource type="PackedScene" uid="uid://dp262jjjt8nxd" path="res://components/snake_head.tscn" id="2_gx6an"]
+
+[node name="Interior" type="Node2D"]
+
+[node name="Obstacle1" parent="." instance=ExtResource("1_vj1ox")]
+modulate = Color(0.909804, 0.0823529, 0.0823529, 1)
+position = Vector2(294, 188)
+
+[node name="Obstacle2" parent="." instance=ExtResource("1_vj1ox")]
+modulate = Color(0.553227, 0.0736, 0.92, 1)
+position = Vector2(566, 492)
+
+[node name="Obstacle3" parent="." instance=ExtResource("1_vj1ox")]
+modulate = Color(0.921569, 0.0745098, 0.596078, 1)
+position = Vector2(912, 272)
+
+[node name="SnakeHead" parent="." instance=ExtResource("2_gx6an")]
+position = Vector2(585, 238)
