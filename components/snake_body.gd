@@ -10,7 +10,7 @@ enum BodySize {
 	set( value ):
 		if body_size != value:
 			body_size = value
-			if get_tree():
+			if is_inside_tree():
 				# As the method updates physics properties, it must be called deferred.
 				call_deferred("_update_body_size")
 

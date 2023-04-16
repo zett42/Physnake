@@ -14,7 +14,7 @@ enum ObstacleSize {
 	set( value ):
 		if obstacle_size != value:
 			obstacle_size = value
-			if get_tree():
+			if is_inside_tree():
 				# As the method updates physics properties, it must be called deferred.
 				call_deferred("_update_obstacle_size")
 
