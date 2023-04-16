@@ -3,7 +3,7 @@ extends DampedSpringJoint2D
 
 @onready var line := $Line as Line2D
 
-func _process( delta ):
+func _process( _delta ):
 	
 	var node1 := get_node( node_a ) as Node2D
 	var node2 := get_node( node_b ) as Node2D

@@ -35,15 +35,12 @@ func _spawn_food():
 	# For immediate shape cast we are supposed to set target_position to 0,0
 	shape_cast.target_position = Vector2.ZERO
 
-	var found_empty_location = false
-
 	# Don't try too often to prevent lags. If not successful this time, then maybe next frame.
 	for i in 100:
 		shape_cast.position = Vector2( randf_range( 0, 1152 ), randf_range( 0, 648 ) )
 		shape_cast.force_shapecast_update()
 
 		if not shape_cast.is_colliding():
-			found_empty_location = true
 
 			var food = food_scene.instantiate()
 			food.position = shape_cast.position
