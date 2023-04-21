@@ -30,11 +30,11 @@ func _ready():
 	
 func _update_obstacle_size():
 	
-	$Mesh_small.visible = obstacle_size == ObstacleSize.SMALL
+	$VisibleShape_small.visible = obstacle_size == ObstacleSize.SMALL
 	$CollisionShape_small.visible = obstacle_size == ObstacleSize.SMALL
 	$CollisionShape_small.disabled = obstacle_size != ObstacleSize.SMALL
 
-	$Mesh_normal.visible = obstacle_size == ObstacleSize.NORMAL
+	$VisibleShape_normal.visible = obstacle_size == ObstacleSize.NORMAL
 	$CollisionShape_normal.visible = obstacle_size == ObstacleSize.NORMAL
 	$CollisionShape_normal.disabled = obstacle_size != ObstacleSize.NORMAL
 
@@ -63,8 +63,8 @@ func _on_body_entered( body: RigidBody2D ):
 		# for safety, code that affects physics should be called deferred
 		call_deferred( "_apply_explosion_impulse" )
 
-		$Mesh_small.visible = false
-		$Mesh_normal.visible = false
+		$VisibleShape_small.visible = false
+		$VisibleShape_normal.visible = false
 
 
 func _apply_explosion_impulse():

@@ -24,14 +24,14 @@ func _update_body_size():
 
 	match body_size:
 		BodySize.NORMAL:
-			$Mesh_normal.visible = true
-			$Mesh_big.visible = false
+			$VisibleShape_normal.visible = true
+			$VisibleShape_big.visible = false
 			$CollisionShape_normal.disabled = false
 			$CollisionShape_big.disabled = true
 			mass = 0.01
 		BodySize.BIG:
-			$Mesh_normal.visible = false
-			$Mesh_big.visible = true
+			$VisibleShape_normal.visible = false
+			$VisibleShape_big.visible = true
 			$CollisionShape_normal.disabled = true
 			$CollisionShape_big.disabled = false
 			mass = 0.025

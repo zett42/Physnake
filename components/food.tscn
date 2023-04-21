@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://dg28fa7njidmr"]
 
 [ext_resource type="Script" path="res://components/food.gd" id="1_f1o5r"]
-[ext_resource type="ArrayMesh" uid="uid://4chd576mg2xc" path="res://mesh/circle_48seg.obj" id="3_8ja3x"]
+[ext_resource type="Script" path="res://shapes/VisibleCircleShape2D.gd" id="2_6mc8l"]
 [ext_resource type="Shape2D" uid="uid://byqfqg6j24gi7" path="res://components/food_collision_shape_normal.tres" id="4_l6x26"]
 [ext_resource type="Shape2D" uid="uid://b0xy0u51igvte" path="res://components/food_collision_shape_big.tres" id="5_t5j03"]
 
@@ -11,20 +11,27 @@ mass = 0.05
 gravity_scale = 0.0
 script = ExtResource("1_f1o5r")
 
-[node name="Mesh_normal" type="MeshInstance2D" parent="."]
-visible = false
-position = Vector2(-2.86102e-06, -2.86102e-06)
-scale = Vector2(0.200038, 0.200038)
-mesh = ExtResource("3_8ja3x")
+[node name="Shape_normal" type="Node2D" parent="."]
+position = Vector2(0, 2.27374e-13)
+script = ExtResource("2_6mc8l")
+radius = 10.0
+num_circle_segments = 32
+border_polygon = PackedVector2Array()
+fill_polygon = PackedVector2Array(10, -2.44921e-15, 9.80785, -1.9509, 9.2388, -3.82683, 8.3147, -5.5557, 7.07107, -7.07107, 5.5557, -8.3147, 3.82683, -9.2388, 1.9509, -9.80785, -1.83691e-15, -10, -1.9509, -9.80785, -3.82683, -9.2388, -5.5557, -8.3147, -7.07107, -7.07107, -8.3147, -5.5557, -9.2388, -3.82683, -9.80785, -1.9509, -10, 1.22461e-15, -9.80785, 1.9509, -9.2388, 3.82683, -8.3147, 5.5557, -7.07107, 7.07107, -5.5557, 8.3147, -3.82683, 9.2388, -1.9509, 9.80785, 6.12303e-16, 10, 1.9509, 9.80785, 3.82683, 9.2388, 5.5557, 8.3147, 7.07107, 7.07107, 8.3147, 5.5557, 9.2388, 3.82683, 9.80785, 1.9509)
 
-[node name="Mesh_big" type="MeshInstance2D" parent="."]
-position = Vector2(-1.33485e-06, -2.86102e-06)
-scale = Vector2(0.300057, 0.300057)
-mesh = ExtResource("3_8ja3x")
+[node name="Shape_big" type="Node2D" parent="."]
+visible = false
+position = Vector2(0, 2.27374e-13)
+script = ExtResource("2_6mc8l")
+radius = 15.0
+num_circle_segments = 48
+border_polygon = PackedVector2Array()
+fill_polygon = PackedVector2Array(15, -3.67382e-15, 14.8717, -1.95789, 14.4889, -3.88229, 13.8582, -5.74025, 12.9904, -7.5, 11.9003, -9.13142, 10.6066, -10.6066, 9.13142, -11.9003, 7.5, -12.9904, 5.74025, -13.8582, 3.88229, -14.4889, 1.95789, -14.8717, -2.75536e-15, -15, -1.95789, -14.8717, -3.88229, -14.4889, -5.74025, -13.8582, -7.5, -12.9904, -9.13142, -11.9003, -10.6066, -10.6066, -11.9003, -9.13142, -12.9904, -7.5, -13.8582, -5.74025, -14.4889, -3.88229, -14.8717, -1.95789, -15, 1.83691e-15, -14.8717, 1.95789, -14.4889, 3.88229, -13.8582, 5.74025, -12.9904, 7.5, -11.9003, 9.13142, -10.6066, 10.6066, -9.13142, 11.9003, -7.5, 12.9904, -5.74025, 13.8582, -3.88229, 14.4889, -1.95789, 14.8717, 9.18455e-16, 15, 1.95789, 14.8717, 3.88229, 14.4889, 5.74025, 13.8582, 7.5, 12.9904, 9.13142, 11.9003, 10.6066, 10.6066, 11.9003, 9.13142, 12.9904, 7.5, 13.8582, 5.74025, 14.4889, 3.88229, 14.8717, 1.95789)
 
 [node name="CollisionShape_normal" type="CollisionShape2D" parent="."]
 visible = false
 shape = ExtResource("4_l6x26")
 
 [node name="CollisionShape_big" type="CollisionShape2D" parent="."]
+visible = false
 shape = ExtResource("5_t5j03")

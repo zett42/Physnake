@@ -13,12 +13,12 @@ func _ready():
 	
 	match food_size:
 		FoodSize.NORMAL:
-			$Mesh_normal.visible = true
-			$Mesh_big.visible = false
+			$Shape_normal.visible = true
+			$Shape_big.visible = false
 			$CollisionShape_normal.set_deferred("disabled", false )
 			$CollisionShape_big.set_deferred("disabled", true )
 		FoodSize.BIG:
-			$Mesh_normal.visible = false
-			$Mesh_big.visible = true
+			$Shape_normal.visible = false
+			$Shape_big.visible = true
 			$CollisionShape_normal.set_deferred("disabled", true )
 			$CollisionShape_big.set_deferred("disabled", false )
