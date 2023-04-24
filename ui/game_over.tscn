@@ -1,6 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://fjecv6h50afm"]
+[gd_scene load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://game_over.gd" id="1_sa6xy"]
+[ext_resource type="Script" path="res://ui/game_over.gd" id="1_sa6xy"]
 
 [node name="GameOver" type="ColorRect"]
 process_mode = 3

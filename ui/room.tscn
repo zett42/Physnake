@@ -1,7 +1,7 @@
 [gd_scene load_steps=11 format=3 uid="uid://dhd4r7ulkmuy1"]
 
-[ext_resource type="Script" path="res://room.gd" id="1_kfr5q"]
-[ext_resource type="PackedScene" path="res://components/food_spawner.tscn" id="2_dv5o3"]
+[ext_resource type="Script" path="res://ui/room.gd" id="1_j8lbu"]
+[ext_resource type="PackedScene" uid="uid://df45hl5y4bimn" path="res://components/food_spawner.tscn" id="2_854ml"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_43je0"]
 bounce = 0.9
@@ -27,7 +27,7 @@ bounce = 0.9
 size = Vector2(279, 25)
 
 [node name="Room" type="Node2D"]
-script = ExtResource("1_kfr5q")
+script = ExtResource("1_j8lbu")
 
 [node name="WallTop" type="StaticBody2D" parent="."]
 position = Vector2(556, 0)
@@ -85,4 +85,4 @@ offset_right = 242.0
 offset_bottom = 27.0
 text = "Time Bonus:"
 
-[node name="FoodSpawner" parent="." instance=ExtResource("2_dv5o3")]
+[node name="FoodSpawner" parent="." instance=ExtResource("2_854ml")]

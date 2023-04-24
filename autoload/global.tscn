@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://global.gd" id="1_4ia5v"]
+[ext_resource type="Script" path="res://autoload/global.gd" id="1_4ia5v"]
 
 [node name="Global" type="Node"]
 process_mode = 3

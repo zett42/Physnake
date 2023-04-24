@@ -1,6 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://duvu5371tuw64"]
+[gd_scene load_steps=2 format=3 uid="uid://cenyjt0ukwgr5"]
 
-[ext_resource type="Script" path="res://start.gd" id="1_mecu1"]
+[ext_resource type="Script" path="res://ui/start.gd" id="1_c2p6v"]
 
 [node name="Start" type="ColorRect"]
 process_mode = 3
@@ -10,7 +10,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.158472, 0.158472, 0.158472, 1)
-script = ExtResource("1_mecu1")
+script = ExtResource("1_c2p6v")
 
 [node name="ChooseLabel" type="Label" parent="."]
 layout_mode = 1

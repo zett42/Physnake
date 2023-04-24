@@ -14,7 +14,7 @@ func _on_button_pressed():
 	get_tree().current_scene.free()
 
 	# Attach the game screen to the root node, making it visible.
-	get_tree().change_scene_to_file("res://start.tscn" )
+	get_tree().change_scene_to_file("res://ui/start.tscn" )
 
 	# Remove the game over screen
 	queue_free()
