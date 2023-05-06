@@ -4,7 +4,7 @@
 I always wanted to know how a physics-based snake game could look and feel. For a two-day project the gameplay turned out to be kinda fun.
 
 As a beginner using Godot, I wanted to try out a few techniques:
-- Vector-like 2D graphics using only polygons (circle shapes) and meshes (skull icon), for perfect scalability and sharp edges. For creating the skull mesh, I started with SVG graphics, which were imported in Blender and exported as *.obj (wavefront), which Godot is able to import. Actually Godot can import SVG, but unfortunately it just converts SVG to textures, with less then optimal scaling quality (you may import with mipmap option and downscale, but it's still kinda blurry compared to mesh contures).
+- Vector-like 2D graphics using only polygons (circle shapes and bezier shapes), for perfect scalability and sharp edges. While Godot can import SVG, it just converts SVG to textures, with less then optimal scaling quality (you may import with mipmap option and downscale, but it's still kinda blurry compared to mesh contures). Polygons are rendered perfectly, but Godot is missing higher level tooling for generating polygons. So I've created tool scripts to generate polygons procedurally.
 - Creating nodes and joints dynamically using script. The `DampedSpringJoint2D` that is used to connect the snake segments turned out to be less intuitive, as it requires us to define a starting point, an angle and a length, instead of simply two points to connect to.
 - Custom collision detection to find a free spot for spawning food. This works well using `ShapeCast2D`.
 - Explosions using GPU particles. This turned out really easy, after finding the right particle settings.
