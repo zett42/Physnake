@@ -203,7 +203,7 @@ func _ensure_polygon_node( p_node: Polygon2D, p_name: String, p_color: Color ) -
 	node.color = p_color
 	node.antialiased = true
 
-	add_child( node, true ) #, Node.INTERNAL_MODE_FRONT )
+	add_child( node, true, Node.INTERNAL_MODE_FRONT )
 
 	if Engine.is_editor_hint():
 		# The line below is required to make the node visible in the Scene tree dock
@@ -220,7 +220,7 @@ static func calculate_circle_polygon( \
 		offset: Vector2 = Vector2.ZERO,
 		only_arc_line: bool = false ) -> PackedVector2Array:
 
-	var array := PackedVector2Array()
+	var result := PackedVector2Array()
 
 	var angle_step := TAU / p_num_circle_segments
 
@@ -237,25 +237,25 @@ static func calculate_circle_polygon( \
 	# Create outer points counter-clockwise
 	
 	for i in num_arc_segments:
-		array.append( polar_to_cartesian( p_radius_outer, end_angle_snapped - i * angle_step ) + offset )
+		result.append( polar_to_cartesian( p_radius_outer, end_angle_snapped - i * angle_step ) + offset )
 
 	# If this is only part of another polygon (e. g. round rect), then we can return "incomplete" shape.
 	if only_arc_line:
-		return array
+		return result
 
 	# Create additional points if we are drawing cake piece or ring.
 	if not is_equal_approx( central_angle_snapped, TAU ) or p_radius_inner > 0:
-		array.append( polar_to_cartesian( p_radius_outer, start_angle_snapped ) )
+		result.append( polar_to_cartesian( p_radius_outer, start_angle_snapped ) )
 
 		if p_radius_inner > 0:
 			# Create inner points clockwise
 			for i in num_arc_segments + 1:
-				array.append( polar_to_cartesian( p_radius_inner, start_angle_snapped + i * angle_step ) + offset )
+				result.append( polar_to_cartesian( p_radius_inner, start_angle_snapped + i * angle_step ) + offset )
 		else:
 			# Create center point of cake piece
-			array.append( offset )
+			result.append( offset )
 
-	return array
+	return result
 	
 
 static func polar_to_cartesian( p_radius: float, p_phi: float ) -> Vector2:
