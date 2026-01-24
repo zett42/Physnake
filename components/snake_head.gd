@@ -12,6 +12,9 @@ const TIME_BONUS_DURATION: float = 1
 const body_scene  := preload("res://components/snake_body.tscn") as PackedScene
 const joint_scene := preload("res://components/snake_joint.tscn") as PackedScene
 
+# Snake controller for trail-following behavior
+var controller = null
+
 # Current tail. This starts with self to be able to connect initial tail to head.
 var tail: PhysicsBody2D = self
 
@@ -30,6 +33,15 @@ func _ready():
 	
 	# To process input without _input() method
 	set_process_input( true )
+	
+	# Enable Continuous Collision Detection for fast movement
+	continuous_cd = RigidBody2D.CCD_MODE_CAST_RAY
+	
+	# Create and initialize the snake controller
+	var SnakeController = preload("res://components/snake_controller.gd")
+	controller = SnakeController.new()
+	get_tree().current_scene.add_child(controller)
+	controller.initialize(self)
 
 	# Add initial snake tail. As tree is locked in _ready(), it must be called deferred.
 	call_deferred( "_spawn_tail", Food.FoodSize.NORMAL )
@@ -185,6 +197,13 @@ func _spawn_tail( food_size: Food.FoodSize, spawn_position: Vector2 = Vector2.ZE
 	get_tree().current_scene.add_child( new_tail )
 	
 	_add_joint( tail, new_tail, joint_len )
+	
+	# Add collision exception between adjacent segments
+	tail.add_collision_exception_with( new_tail )
+	
+	# Register segment with controller for trail-following
+	if controller != null:
+		controller.register_segment( new_tail )
 	
 	tail = new_tail
 	

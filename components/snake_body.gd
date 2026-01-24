@@ -18,6 +18,9 @@ func _ready():
 
 	# Physics steps haven't run for this object yet, so call_deferred() is not required.
 	_update_body_size()
+	
+	# Enable Continuous Collision Detection for fast-moving segments
+	continuous_cd = RigidBody2D.CCD_MODE_CAST_RAY
 
 
 func _update_body_size():
