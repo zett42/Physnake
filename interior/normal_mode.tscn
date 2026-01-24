@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://vh6bdtlm7lve"]
 
-[ext_resource type="PackedScene" uid="uid://331f06pw233k" path="res://components/obstacle.tscn" id="1_vj1ox"]
-[ext_resource type="PackedScene" uid="uid://dp262jjjt8nxd" path="res://components/snake_head.tscn" id="2_gx6an"]
+[ext_resource type="PackedScene" uid="uid://bgvgv00nkva5v" path="res://components/obstacle.tscn" id="1_vj1ox"]
+[ext_resource type="PackedScene" uid="uid://c8j7mxxvdsagi" path="res://components/snake_head.tscn" id="2_gx6an"]
 
 [node name="Interior" type="Node2D"]
 
