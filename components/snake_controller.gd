@@ -6,7 +6,6 @@ extends Node2D
 
 # Breadcrumb recording
 const BREADCRUMB_RECORD_DISTANCE: float = 2.0  # Record every 2 pixels
-const SEGMENT_SPACING: float = 20.0  # Base distance between segments (slightly less than joint rest length)
 
 # Path guidance tuning
 @export var path_guidance_kp: float = 50.0  # Position stiffness (gentle guidance)
@@ -39,10 +38,11 @@ func initialize(snake_head: RigidBody2D) -> void:
 	total_length = 0.0
 
 
-func register_segment(segment: RigidBody2D) -> void:
+func register_segment(segment: RigidBody2D, joint_length: float) -> void:
 	"""Register a new body segment with the controller."""
 	segments.append(segment)
 	segment.set_meta("spawn_time", Time.get_ticks_msec())
+	segment.set_meta("joint_length", joint_length)
 
 
 func _physics_process(_delta: float) -> void:
@@ -90,13 +90,19 @@ func _update_segment_targets() -> void:
 	# Sample targets for all segments in one pass
 	var crumb_index := breadcrumb_positions.size() - 1
 	
+	# Accumulate actual distances for precise positioning
+	var accumulated_distance := 0.0
+	
 	for i in range(segments.size()):
 		if not is_instance_valid(segments[i]):
 			continue
 		
+		# Get this segment's actual joint length
+		var joint_length := segments[i].get_meta("joint_length", 25.0) as float
+		accumulated_distance += joint_length
+		
 		# Calculate target distance behind the head
-		var distance_behind := (i + 1) * SEGMENT_SPACING
-		var target_length := total_length - distance_behind
+		var target_length := total_length - accumulated_distance
 		
 		# Find the target position on the breadcrumb path
 		var target_position := _sample_position_at_length(target_length, crumb_index)
@@ -173,8 +179,12 @@ func _apply_guidance_force(segment: RigidBody2D, target_position: Vector2, drive
 func _cleanup_breadcrumbs() -> void:
 	"""Remove old breadcrumbs that are no longer needed."""
 	
-	# Calculate required history length
-	var max_segment_distance := (segments.size() + 5) * SEGMENT_SPACING  # +5 margin
+	# Calculate required history length based on actual segment lengths
+	var max_segment_distance := 0.0
+	for segment in segments:
+		if is_instance_valid(segment):
+			max_segment_distance += segment.get_meta("joint_length", 25.0) as float
+	max_segment_distance += 125.0  # Add margin (5 segments worth at base length)
 	var min_required_length := total_length - max_segment_distance
 	
 	# Remove breadcrumbs before the required length

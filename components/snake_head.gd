@@ -8,6 +8,11 @@ const SNAKE_ACCELERATION: float = 10
 const MAX_TIME_BONUS: float = 5
 const TIME_BONUS_DURATION: float = 1
 
+# Joint length constants
+const JOINT_BASE_REST_LENGTH: float = 25.0  # Base rest length from joint scene
+const JOINT_HEAD_BONUS: float = 4.0  # Extra length when connecting to head
+const JOINT_BIG_SEGMENT_BONUS: float = 6.0  # Extra length for big segments
+
 # Components that will be spawend.
 const body_scene  := preload("res://components/snake_body.tscn") as PackedScene
 const joint_scene := preload("res://components/snake_joint.tscn") as PackedScene
@@ -148,17 +153,15 @@ func _check_tail_spawning():
 func _calculate_joint_length( food_size: Food.FoodSize ) -> float:
 	"""Calculate the joint length for a given food size."""
 	
-	var joint_len := 24.0
-	const joint_len_head_add := 4.0
-	const joint_len_big_add := 6.0
+	var joint_len := JOINT_BASE_REST_LENGTH
 	
 	if tail == self:
-		joint_len += joint_len_head_add
+		joint_len += JOINT_HEAD_BONUS
 	elif (tail as SnakeBody).body_size == SnakeBody.BodySize.BIG:
-		joint_len += joint_len_big_add
+		joint_len += JOINT_BIG_SEGMENT_BONUS
 	
 	if food_size == Food.FoodSize.BIG:
-		joint_len += joint_len_big_add
+		joint_len += JOINT_BIG_SEGMENT_BONUS
 	
 	return joint_len
 	
@@ -193,7 +196,7 @@ func _spawn_tail( food_size: Food.FoodSize, spawn_position: Vector2 = Vector2.ZE
 	
 	# Register segment with controller for trail-following
 	if controller != null:
-		controller.register_segment( new_tail )
+		controller.register_segment( new_tail, joint_len )
 	
 	tail = new_tail
 	
