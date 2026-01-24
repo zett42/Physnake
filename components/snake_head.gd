@@ -166,24 +166,14 @@ func _calculate_joint_length( food_size: Food.FoodSize ) -> float:
 func _spawn_tail( food_size: Food.FoodSize, spawn_position: Vector2 = Vector2.ZERO ):
 	
 	var new_tail := body_scene.instantiate() as SnakeBody
-
-	var joint_len := 24
-	const joint_len_head_add := 4
-	const joint_len_big_add := 6
-
-	if tail == self:
-		# Make joint longer to accomodate for head size.
-		joint_len += joint_len_head_add
-	elif (tail as SnakeBody).body_size == SnakeBody.BodySize.BIG:
-		# Make joint longer to accomodate for big size of current tail.
-		joint_len += joint_len_big_add
+	
+	# Calculate joint length using the dedicated function
+	var joint_len := _calculate_joint_length( food_size )
 	
 	if food_size == Food.FoodSize.NORMAL:
 		new_tail.body_size = SnakeBody.BodySize.NORMAL
 	else:
-		new_tail.body_size = SnakeBody.BodySize.BIG
-		# Make joint longer to accomodate for big size of new tail
-		joint_len += joint_len_big_add	
+		new_tail.body_size = SnakeBody.BodySize.BIG	
 
 	# Use stored spawn position or fall back to tail position with offset
 	if spawn_position != Vector2.ZERO:
