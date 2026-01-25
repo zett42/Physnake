@@ -7,7 +7,7 @@ top_level = true
 disable_collision = false
 length = 30.0
 rest_length = 25.0
-stiffness = 30.0
+stiffness = 40.0
 damping = 0.1
 script = ExtResource("1_bw66t")
 
