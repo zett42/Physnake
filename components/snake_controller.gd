@@ -8,11 +8,11 @@ extends Node2D
 const BREADCRUMB_RECORD_DISTANCE: float = 2.0  # Record every 2 pixels
 
 # Path guidance tuning
-@export var path_guidance_kp: float = 50.0  # Position stiffness (gentle guidance)
-@export var path_guidance_kd: float = 20.0  # Velocity damping
+@export var path_guidance_kp: float = 50.0     # Position stiffness (gentle guidance)
+@export var path_guidance_kd: float = 1.5      # Velocity damping - reduces oscillations
 @export var max_guidance_force: float = 200.0  # Force clamp (keep it subtle)
-@export var reference_speed: float = 400.0  # Speed for drive factor calculation
-@export var min_drive_threshold: float = 0.1  # Minimum speed ratio to activate guidance
+@export var reference_speed: float = 400.0     # Speed for drive factor calculation
+@export var min_drive_threshold: float = 0.1   # Minimum speed ratio to activate guidance
 
 # Breadcrumb storage (append-only for performance)
 var breadcrumb_positions: PackedVector2Array = PackedVector2Array()
@@ -78,7 +78,7 @@ func _update_segment_targets() -> void:
 	if breadcrumb_positions.size() < 2:
 		return
 	
-	# Calculate drive factor (0 = idle, 1 = moving)
+	# Calculate drive factor (0 = idle, 1 = moving), that avoids unwanted movement when the head is stopped.
 	# Use squared scaling for smoother transition
 	var drive_factor := 0.0
 	if is_instance_valid(head):

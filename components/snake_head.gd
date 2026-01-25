@@ -2,8 +2,8 @@ extends RigidBody2D
 
 # Movement speed and acceleration (when key is hold)
 const SNAKE_MIN_SPEED: float = 300
-const SNAKE_MAX_SPEED: float = 1800
-const SNAKE_ACCELERATION: float = 10
+const SNAKE_MAX_SPEED: float = 2000
+const SNAKE_ACCELERATION: float = 20
 
 const MAX_TIME_BONUS: float = 5
 const TIME_BONUS_DURATION: float = 1
