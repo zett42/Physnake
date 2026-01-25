@@ -43,8 +43,8 @@ func _ready():
 	continuous_cd = RigidBody2D.CCD_MODE_CAST_RAY
 	
 	# Create and initialize the snake controller
-	var SnakeController = preload("res://components/snake_controller.gd")
-	controller = SnakeController.new()
+	const snake_controller_script := preload("res://components/snake_controller.gd")
+	controller = snake_controller_script.new()
 	get_tree().current_scene.add_child(controller)
 	controller.initialize(self)
 
