@@ -1,5 +1,5 @@
 class_name SnakeController
-extends Node2D
+extends Node
 
 ## Controls snake trail-following behavior using breadcrumb path
 ## Records head positions and provides target positions for body segments

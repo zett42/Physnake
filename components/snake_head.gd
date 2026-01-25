@@ -18,7 +18,7 @@ const body_scene  := preload("res://components/snake_body.tscn") as PackedScene
 const joint_scene := preload("res://components/snake_joint.tscn") as PackedScene
 
 # Snake controller for trail-following behavior
-var controller = null
+var controller: SnakeController = null
 
 # Current tail. This starts with self to be able to connect initial tail to head.
 var tail: PhysicsBody2D = self
@@ -43,9 +43,8 @@ func _ready():
 	continuous_cd = RigidBody2D.CCD_MODE_CAST_RAY
 	
 	# Create and initialize the snake controller
-	const snake_controller_script := preload("res://components/snake_controller.gd")
-	controller = snake_controller_script.new()
-	get_tree().current_scene.add_child(controller)
+	controller = SnakeController.new()
+	add_child(controller)
 	controller.initialize(self)
 
 	# Add initial snake tail. As tree is locked in _ready(), it must be called deferred.
