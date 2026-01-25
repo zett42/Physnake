@@ -45,7 +45,7 @@ func _spawn_food():
 			var food = food_scene.instantiate()
 			food.position = shape_cast.position
 			food.food_size = food_size
-			food.food_tail_count = randi_range(1, Food.MAX_TAIL_COUNT)
+			food.food_nutrition = randi_range(1, Food.MAX_NUTRITION)
 		
 			get_parent().add_child( food )	
 			break

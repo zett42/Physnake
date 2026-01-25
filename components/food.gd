@@ -6,10 +6,10 @@ enum FoodSize {
 	BIG,
 }
 
-const MAX_TAIL_COUNT: int = 3
+const MAX_NUTRITION: int = 3
 
 @export var food_size: FoodSize = FoodSize.NORMAL
-@export var food_tail_count: int = 1
+@export var food_nutrition: int = 1
 
 
 func _ready():
@@ -32,7 +32,7 @@ func _ready():
 func _setup_tail_count_rings(parent_node: Node2D, base_radius: float):
 	"""Create concentric ring shapes to indicate tail count."""
 	
-	var rings_to_draw := food_tail_count - 1
+	var rings_to_draw := food_nutrition - 1
 	if rings_to_draw <= 0:
 		return
 	
