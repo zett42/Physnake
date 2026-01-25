@@ -109,6 +109,7 @@ func _on_body_entered( body: Node ):
 			var segment_index := controller.segments.find(body)
 			# Die if colliding with segment beyond the first 2
 			if segment_index >= 2:
+				$OuchSound.play()
 				if poisoned_animation != null:
 					poisoned_animation.start_animation(segment_index)
 				Global.set_game_over()

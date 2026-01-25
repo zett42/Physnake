@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://components/snake_head.gd" id="1_mu00g"]
 [ext_resource type="Script" path="res://shapes/visible_circle_shape_2d.gd" id="2_qv0n0"]
 [ext_resource type="AudioStream" uid="uid://cmw7b1ptnb5kn" path="res://sounds/eat.wav" id="3_pldhu"]
+[ext_resource type="AudioStream" path="res://sounds/ouch.wav" id="4_ouch"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_it4ar"]
 radius = 15.0
@@ -49,5 +50,8 @@ shape = SubResource("CircleShape2D_it4ar")
 
 [node name="EatSound" type="AudioStreamPlayer2D" parent="."]
 stream = SubResource("AudioStreamRandomizer_wtblp")
+
+[node name="OuchSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("4_ouch")
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
