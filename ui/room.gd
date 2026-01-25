@@ -9,6 +9,8 @@ func _ready():
 	var child_scene: PackedScene = null
 	if Global.difficulty == Global.Difficulty.HARD:
 		child_scene = load("res://interior/hard_mode.tscn")
+	elif Global.difficulty == Global.Difficulty.EASY:
+		child_scene = load("res://interior/easy_mode.tscn")
 	else:
 		child_scene = load("res://interior/normal_mode.tscn") 
 

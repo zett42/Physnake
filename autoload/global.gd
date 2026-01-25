@@ -13,6 +13,7 @@ extends Node
 
 
 enum Difficulty {
+	EASY,
 	NORMAL,
 	HARD
 }

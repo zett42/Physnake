@@ -24,6 +24,23 @@ theme_override_font_sizes/font_size = 40
 text = "CHOOSE DIFFICULTY:"
 horizontal_alignment = 1
 
+[node name="EasyButton" type="Button" parent="."]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -152.0
+offset_right = 100.0
+offset_bottom = -89.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 40
+text = "EASY"
+
 [node name="NormalButton" type="Button" parent="."]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 1
@@ -33,9 +50,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -100.0
-offset_top = -108.5
+offset_top = -64.5
 offset_right = 100.0
-offset_bottom = -45.5
+offset_bottom = -1.5
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 40
@@ -50,9 +67,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -100.0
-offset_top = -21.0
+offset_top = 23.0
 offset_right = 100.0
-offset_bottom = 42.0
+offset_bottom = 86.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 40
@@ -74,5 +91,6 @@ and eat the green food to get score.
 Avoid the evil 💀 stones."
 horizontal_alignment = 1
 
+[connection signal="pressed" from="EasyButton" to="." method="_on_easy_button_pressed"]
 [connection signal="pressed" from="NormalButton" to="." method="_on_normal_button_pressed"]
 [connection signal="pressed" from="HardButton" to="." method="_on_hard_button_pressed"]
