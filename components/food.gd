@@ -6,7 +6,10 @@ enum FoodSize {
 	BIG,
 }
 
+const MAX_TAIL_COUNT: int = 3
+
 @export var food_size: FoodSize = FoodSize.NORMAL
+@export var food_tail_count: int = 1
 
 
 func _ready():

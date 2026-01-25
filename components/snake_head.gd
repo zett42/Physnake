@@ -94,7 +94,7 @@ func _on_body_entered( body: Node ):
 		$EatSound.play()
 		
 		# Buffer the food for later spawning of snake segment
-		call_deferred( "_buffer_food", body.food_size )
+		call_deferred( "_buffer_food", body.food_size, body.food_tail_count )
 		
 		# remove collided food
 		body.queue_free()
@@ -106,17 +106,19 @@ func _on_body_entered( body: Node ):
 		time_bonus = MAX_TIME_BONUS
 	
 
-func _buffer_food( food_size: Food.FoodSize ):
+func _buffer_food( food_size: Food.FoodSize, tail_count: int = 1 ):
 	"""Buffer eaten food for later spawning."""
 	
-	# Record current tail position where the segment should eventually spawn
-	food_buffer.append({
-		"food_size": food_size,
-		"tail_position": tail.global_position
-	})
+	# Add multiple entries to buffer based on food_tail_count
+	for i in tail_count:
+		# Record current tail position where the segment should eventually spawn
+		food_buffer.append({
+			"food_size": food_size,
+			"tail_position": tail.global_position
+		})
 	
 	# Reset tail spawn distance tracker when eating first food
-	if food_buffer.size() == 1:
+	if food_buffer.size() == tail_count:
 		tail_spawn_distance = 0.0
 
 
