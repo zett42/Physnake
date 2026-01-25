@@ -18,4 +18,4 @@ modulate = Color(0.921569, 0.0745098, 0.596078, 1)
 position = Vector2(912, 272)
 
 [node name="SnakeHead" parent="." instance=ExtResource("2_gx6an")]
-position = Vector2(585, 238)
+position = Vector2(141, 354)
