@@ -6,7 +6,6 @@ extends Node
 
 # Breadcrumb recording
 const BREADCRUMB_RECORD_DISTANCE: float = 2.0  # Record every 2 pixels
-const MAX_BREADCRUMB_COUNT: int = 1000  # Limit breadcrumb storage
 
 # Path guidance tuning
 @export var path_guidance_kp: float = 50.0     # Position stiffness (gentle guidance)
@@ -187,22 +186,15 @@ func _apply_guidance_force(segment: RigidBody2D, target_position: Vector2, drive
 func _cleanup_breadcrumbs() -> void:
 	"""Remove old breadcrumbs that are no longer needed."""
 	
-	# Hard limit on breadcrumb count
-	if breadcrumb_positions.size() > MAX_BREADCRUMB_COUNT:
-		var excess := breadcrumb_positions.size() - MAX_BREADCRUMB_COUNT
-		breadcrumb_positions = breadcrumb_positions.slice(excess)
-		breadcrumb_lengths = breadcrumb_lengths.slice(excess)
-		# Don't need to adjust total_length - it's still accurate
-	
 	# Calculate required history length based on actual segment lengths
 	var max_segment_distance := 0.0
 	for segment in segments:
 		if is_instance_valid(segment):
 			max_segment_distance += segment.get_meta("joint_length", 25.0) as float
-	max_segment_distance += 200.0  # Add margin
+	max_segment_distance += 200.0  # Add safety margin
 	var min_required_length := total_length - max_segment_distance
 	
-	# Find how many breadcrumbs to remove
+	# Find how many breadcrumbs to remove (only remove those definitely not needed)
 	var remove_count := 0
 	for i in range(breadcrumb_lengths.size()):
 		if breadcrumb_lengths[i] < min_required_length:
@@ -210,7 +202,7 @@ func _cleanup_breadcrumbs() -> void:
 		else:
 			break
 	
-	# Keep at least 10 breadcrumbs for stability
+	# Keep at least 10 breadcrumbs for stability, and only cleanup if we have excess
 	if remove_count > 0 and breadcrumb_positions.size() - remove_count >= 10:
 		# Use slice for better performance
 		breadcrumb_positions = breadcrumb_positions.slice(remove_count)
