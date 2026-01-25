@@ -30,6 +30,10 @@ var current_speed: float = SNAKE_MIN_SPEED
 # Current direction for automatic movement mode (absolute directions)
 var current_direction: Vector2 = Vector2.RIGHT
 
+# Boost mechanic for automatic movement
+var boost_hold_time: float = 0.0  # Time keys matching direction have been held
+const BOOST_DELAY: float = 0.25  # Delay before boost activates (in seconds)
+
 # Time bonus if snake eats food quickly.
 var time_bonus: float = MAX_TIME_BONUS
 
@@ -84,13 +88,13 @@ func _integrate_forces( _state ):
 
 	if Global.auto_move:
 		# Automatic movement mode (normal/hard difficulty)
-		_handle_automatic_movement()
+		_handle_automatic_movement(_state.step)
 	else:
 		# Manual movement mode (easy difficulty)
 		_handle_manual_movement()
 
 
-func _handle_automatic_movement():
+func _handle_automatic_movement(delta: float):
 	"""Handle automatic forward movement with absolute directional input."""
 	
 	# Check for direction changes (absolute directions, not relative to snake)
@@ -124,10 +128,48 @@ func _handle_automatic_movement():
 			# Prevent turning 180 degrees (opposite direction)
 			if new_direction.dot(current_direction) > -0.9:  # Not opposite (allowing some tolerance)
 				current_direction = new_direction
+				# Reset boost timer when direction changes
+				boost_hold_time = 0.0
+	
+	# Check if player is holding keys matching the current direction (boost mechanic)
+	var held_direction := Vector2.ZERO
+	if Input.is_action_pressed("move_up"):
+		held_direction.y = -1.0
+	elif Input.is_action_pressed("move_down"):
+		held_direction.y = 1.0
+	
+	if Input.is_action_pressed("move_left"):
+		held_direction.x = -1.0
+	elif Input.is_action_pressed("move_right"):
+		held_direction.x = 1.0
+	
+	# Determine target speed based on whether held keys match current direction
+	var target_speed := SNAKE_MAX_SPEED_AUTO
+	var keys_match_direction := false
+	
+	if held_direction != Vector2.ZERO:
+		held_direction = held_direction.normalized()
+		# If held direction closely matches current direction, track boost timer
+		if held_direction.dot(current_direction) > 0.9:
+			keys_match_direction = true
+			boost_hold_time += delta
+			
+			# Enable boost only after delay
+			if boost_hold_time >= BOOST_DELAY:
+				target_speed = SNAKE_MAX_SPEED
+	
+	# Reset boost timer if keys don't match direction
+	if not keys_match_direction:
+		boost_hold_time = 0.0
+	
+	# Accelerate or decelerate towards target speed
+	if current_speed < target_speed:
+		current_speed = minf(current_speed + SNAKE_ACCELERATION, target_speed)
+	elif current_speed > target_speed:
+		current_speed = maxf(current_speed - SNAKE_ACCELERATION, target_speed)
 	
 	# Always move in the current direction
 	apply_central_force(current_direction.normalized() * current_speed)
-	current_speed = minf(current_speed + SNAKE_ACCELERATION, SNAKE_MAX_SPEED_AUTO)
 
 
 func _handle_manual_movement():
