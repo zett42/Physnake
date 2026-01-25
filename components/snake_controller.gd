@@ -86,10 +86,7 @@ func _update_segment_targets() -> void:
 		if speed_ratio > min_drive_threshold:
 			drive_factor = clampf(speed_ratio, 0.0, 1.0)
 			drive_factor = drive_factor * drive_factor  # Square for smoother ramp
-	
-	# Sample targets for all segments in one pass
-	var crumb_index := breadcrumb_positions.size() - 1
-	
+		
 	# Accumulate actual distances for precise positioning
 	var accumulated_distance := 0.0
 	
@@ -105,23 +102,17 @@ func _update_segment_targets() -> void:
 		var target_length := total_length - accumulated_distance
 		
 		# Find the target position on the breadcrumb path
-		var target_position := _sample_position_at_length(target_length, crumb_index)
-		
-		# Calculate age-based ramp for new segments (0 to 1 over first second)
-		var age_factor := 1.0
-		if segments[i].has_meta("spawn_time"):
-			var age: int = Time.get_ticks_msec() - segments[i].get_meta("spawn_time")
-			age_factor = clampf(age / 1000.0, 0.0, 1.0)  # Ramp up over 1 second
+		var target_position := _sample_position_at_length(target_length)
 		
 		# Apply path guidance force (PD controller)
-		_apply_guidance_force(segments[i], target_position, drive_factor * age_factor)
+		_apply_guidance_force(segments[i], target_position, drive_factor)
 		
 		# Store for potential use by segment
 		segments[i].set_meta("target_position", target_position)
 		segments[i].set_meta("drive_factor", drive_factor)
 
 
-func _sample_position_at_length(target_length: float, _start_index: int) -> Vector2:
+func _sample_position_at_length(target_length: float) -> Vector2:
 	"""Sample a position at a given arc length along the breadcrumb path."""
 	
 	# Clamp to available range
