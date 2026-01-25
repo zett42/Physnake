@@ -49,9 +49,9 @@ func is_game_over() -> bool:
 	return _is_game_over
 	
 
-func add_score():
+func add_score( amount: int = 1 ):
 
-	total_score += 1
+	total_score += amount
 
 	update_score_display()
 	

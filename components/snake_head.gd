@@ -100,8 +100,8 @@ func _on_body_entered( body: Node ):
 		body.queue_free()
 		
 		# update score
-		Global.add_score()
-		Global.add_bonus( ceili( time_bonus ) )
+		Global.add_score( body.food_nutrition )
+		Global.add_bonus( ceili( time_bonus ) * body.food_nutrition )
 		
 		time_bonus = MAX_TIME_BONUS
 	
