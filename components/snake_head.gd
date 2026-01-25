@@ -33,6 +33,9 @@ var time_bonus: float = MAX_TIME_BONUS
 var food_buffer: Array[Dictionary] = []  # Stores {food_size: Food.FoodSize, tail_position: Vector2}
 var tail_spawn_distance: float = 0.0  # Accumulated distance traveled by tail
 
+# Death animation
+var poisoned_animation: SnakePoisonedAnimation = null
+
 
 func _ready():
 	
@@ -46,12 +49,22 @@ func _ready():
 	controller = SnakeController.new()
 	add_child(controller)
 	controller.initialize(self)
+	
+	# Create and initialize the poisoned animation
+	poisoned_animation = SnakePoisonedAnimation.new()
+	add_child(poisoned_animation)
+	poisoned_animation.initialize(self, controller)
 
 	# Add initial snake tail. As tree is locked in _ready(), it must be called deferred.
 	call_deferred( "_spawn_tail", Food.FoodSize.NORMAL )
 
 
 func _process( delta ):
+	
+	if poisoned_animation != null and poisoned_animation.is_animating:
+		# Play death animation
+		poisoned_animation.update_animation(delta)
+		return
 	
 	time_bonus = maxf( 0, time_bonus - 1 / TIME_BONUS_DURATION * delta )
 	Global.time_bonus = ceili( time_bonus )
@@ -88,6 +101,18 @@ func _on_body_entered( body: Node ):
 	
 	if Global.is_game_over():
 		return
+	
+	# Check for collision with snake's own body (excluding first 2 segments)
+	if body is SnakeBody:
+		# Get all registered segments from the controller
+		if controller != null and controller.segments.size() > 2:
+			var segment_index := controller.segments.find(body)
+			# Die if colliding with segment beyond the first 2
+			if segment_index >= 2:
+				if poisoned_animation != null:
+					poisoned_animation.start_animation(segment_index)
+				Global.set_game_over()
+				return
 	
 	if body.is_in_group("food"):
 		
@@ -224,3 +249,7 @@ func _add_joint( body1: PhysicsBody2D, body2: PhysicsBody2D, rest_length: float 
 	joint.node_b = body2.get_path()
 	
 	get_tree().current_scene.add_child( joint )
+	
+	# Track the joint for death animation
+	if poisoned_animation != null:
+		poisoned_animation.register_joint(joint)
