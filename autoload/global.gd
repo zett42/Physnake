@@ -19,6 +19,7 @@ enum Difficulty {
 }
 
 @export var difficulty = Difficulty.NORMAL
+var auto_move: bool = true  # True for automatic movement (normal/hard), false for manual (easy)
 
 
 var total_score: int = 0
@@ -33,6 +34,9 @@ func reset_game_state():
 	_is_game_over = false
 	total_score = 0
 	total_bonus = 0
+	
+	# Set auto_move based on difficulty: Easy = manual, Normal/Hard = automatic
+	auto_move = (difficulty != Difficulty.EASY)
 	
 
 func get_total_score():

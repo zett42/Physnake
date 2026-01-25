@@ -3,6 +3,7 @@ extends RigidBody2D
 # Movement speed and acceleration (when key is hold)
 const SNAKE_MIN_SPEED: float = 300
 const SNAKE_MAX_SPEED: float = 2000
+const SNAKE_MAX_SPEED_AUTO: float = 750  # Lower speed for automatic movement mode
 const SNAKE_ACCELERATION: float = 20
 
 const MAX_TIME_BONUS: float = 5
@@ -25,6 +26,9 @@ var tail: PhysicsBody2D = self
 
 # Current snake speed
 var current_speed: float = SNAKE_MIN_SPEED
+
+# Current direction for automatic movement mode (absolute directions)
+var current_direction: Vector2 = Vector2.RIGHT
 
 # Time bonus if snake eats food quickly.
 var time_bonus: float = MAX_TIME_BONUS
@@ -78,6 +82,57 @@ func _integrate_forces( _state ):
 	if Global.is_game_over():
 		return
 
+	if Global.auto_move:
+		# Automatic movement mode (normal/hard difficulty)
+		_handle_automatic_movement()
+	else:
+		# Manual movement mode (easy difficulty)
+		_handle_manual_movement()
+
+
+func _handle_automatic_movement():
+	"""Handle automatic forward movement with absolute directional input."""
+	
+	# Check for direction changes (absolute directions, not relative to snake)
+	# Only change direction when a key is newly pressed, but sample all held keys for diagonals
+	var direction_changed := false
+	var new_direction := Vector2.ZERO
+	
+	# Detect vertical input
+	if Input.is_action_just_pressed("move_up") or Input.is_action_just_pressed("move_down"):
+		direction_changed = true
+	
+	# Detect horizontal input  
+	if Input.is_action_just_pressed("move_left") or Input.is_action_just_pressed("move_right"):
+		direction_changed = true
+	
+	# When a direction key is pressed, sample all currently held keys
+	if direction_changed:
+		if Input.is_action_pressed("move_up"):
+			new_direction.y = -1.0
+		elif Input.is_action_pressed("move_down"):
+			new_direction.y = 1.0
+		
+		if Input.is_action_pressed("move_left"):
+			new_direction.x = -1.0
+		elif Input.is_action_pressed("move_right"):
+			new_direction.x = 1.0
+		
+		# Only change direction if it's not opposite to current direction
+		if new_direction != Vector2.ZERO:
+			new_direction = new_direction.normalized()
+			# Prevent turning 180 degrees (opposite direction)
+			if new_direction.dot(current_direction) > -0.9:  # Not opposite (allowing some tolerance)
+				current_direction = new_direction
+	
+	# Always move in the current direction
+	apply_central_force(current_direction.normalized() * current_speed)
+	current_speed = minf(current_speed + SNAKE_ACCELERATION, SNAKE_MAX_SPEED_AUTO)
+
+
+func _handle_manual_movement():
+	"""Handle manual movement mode (original behavior for easy mode)."""
+	
 	var direction := Vector2.ZERO
 	
 	if Input.is_action_pressed("move_up"):
@@ -91,8 +146,8 @@ func _integrate_forces( _state ):
 		direction.x = 1.0
 
 	if direction.length() > 0:
-		apply_central_force( direction.normalized() * current_speed )
-		current_speed = minf( current_speed + SNAKE_ACCELERATION, SNAKE_MAX_SPEED )
+		apply_central_force(direction.normalized() * current_speed)
+		current_speed = minf(current_speed + SNAKE_ACCELERATION, SNAKE_MAX_SPEED)
 	else:
 		current_speed = SNAKE_MIN_SPEED
 
