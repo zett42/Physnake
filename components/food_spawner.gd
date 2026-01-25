@@ -6,7 +6,7 @@ const food_scene = preload("res://components/food.tscn")
 const BIG_FOOD_PROPABILITY: float = 0.1
 
 
-@export var food_count: int = 100
+@export var food_count: int = 25
 
 
 @onready var _shape_cast_normal := $ShapeCast_normal as ShapeCast2D
