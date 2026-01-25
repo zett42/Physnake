@@ -6,6 +6,7 @@ extends Node
 
 # Breadcrumb recording
 const BREADCRUMB_RECORD_DISTANCE: float = 2.0  # Record every 2 pixels
+const MAX_BREADCRUMB_COUNT: int = 1000  # Limit breadcrumb storage
 
 # Path guidance tuning
 @export var path_guidance_kp: float = 50.0     # Position stiffness (gentle guidance)
@@ -13,6 +14,9 @@ const BREADCRUMB_RECORD_DISTANCE: float = 2.0  # Record every 2 pixels
 @export var max_guidance_force: float = 200.0  # Force clamp (keep it subtle)
 @export var reference_speed: float = 400.0     # Speed for drive factor calculation
 @export var min_drive_threshold: float = 0.1   # Minimum speed ratio to activate guidance
+
+# Optimization
+var last_search_index: int = 0  # Cache last search position for sequential lookups
 
 # Breadcrumb storage (append-only for performance)
 var breadcrumb_positions: PackedVector2Array = PackedVector2Array()
@@ -85,10 +89,13 @@ func _update_segment_targets() -> void:
 		var speed_ratio := head.linear_velocity.length() / reference_speed
 		if speed_ratio > min_drive_threshold:
 			drive_factor = clampf(speed_ratio, 0.0, 1.0)
-			drive_factor = drive_factor * drive_factor  # Square for smoother ramp
+			drive_factor = drive_factor * drive_factor  # Squared for smoother ramp
 		
 	# Accumulate actual distances for precise positioning
 	var accumulated_distance := 0.0
+	
+	# Reset search index for sequential lookup optimization
+	last_search_index = 0
 	
 	for i in range(segments.size()):
 		if not is_instance_valid(segments[i]):
@@ -121,18 +128,21 @@ func _sample_position_at_length(target_length: float) -> Vector2:
 	if target_length >= total_length:
 		return breadcrumb_positions[breadcrumb_positions.size() - 1]
 	
-	# Binary search for efficiency (could also be linear since we often search in order)
-	var left := 0
-	var right := breadcrumb_lengths.size() - 1
+	# Optimize for sequential access (segments are queried in order)
+	# Start search from last index since next segment is likely nearby
+	var index := last_search_index
+	var size := breadcrumb_lengths.size()
 	
-	while left < right:
-		var mid := int((left + right + 1) / 2.0)
-		if breadcrumb_lengths[mid] <= target_length:
-			left = mid
-		else:
-			right = mid - 1
+	# Forward scan (most common case)
+	while index < size - 1 and breadcrumb_lengths[index + 1] < target_length:
+		index += 1
 	
-	var index := left
+	# Backward scan (less common, happens when segments are reordered)
+	while index > 0 and breadcrumb_lengths[index] > target_length:
+		index -= 1
+	
+	# Cache for next lookup
+	last_search_index = index
 	
 	# Interpolate between points if needed
 	if index < breadcrumb_lengths.size() - 1:
@@ -150,8 +160,15 @@ func _sample_position_at_length(target_length: float) -> Vector2:
 func _apply_guidance_force(segment: RigidBody2D, target_position: Vector2, drive_factor: float) -> void:
 	"""Apply PD force to guide segment toward its target."""
 	
-	# Calculate PD force
+	# Calculate position error
 	var position_error := target_position - segment.global_position
+	
+	# Only apply force if error is significant
+	var error_magnitude := position_error.length()
+	if error_magnitude < 1.0:  # Within 1 pixel is close enough
+		return
+	
+	# Velocity damping
 	var velocity_error := -segment.linear_velocity
 	
 	var force := path_guidance_kp * position_error + path_guidance_kd * velocity_error
@@ -170,15 +187,22 @@ func _apply_guidance_force(segment: RigidBody2D, target_position: Vector2, drive
 func _cleanup_breadcrumbs() -> void:
 	"""Remove old breadcrumbs that are no longer needed."""
 	
+	# Hard limit on breadcrumb count
+	if breadcrumb_positions.size() > MAX_BREADCRUMB_COUNT:
+		var excess := breadcrumb_positions.size() - MAX_BREADCRUMB_COUNT
+		breadcrumb_positions = breadcrumb_positions.slice(excess)
+		breadcrumb_lengths = breadcrumb_lengths.slice(excess)
+		# Don't need to adjust total_length - it's still accurate
+	
 	# Calculate required history length based on actual segment lengths
 	var max_segment_distance := 0.0
 	for segment in segments:
 		if is_instance_valid(segment):
 			max_segment_distance += segment.get_meta("joint_length", 25.0) as float
-	max_segment_distance += 125.0  # Add margin (5 segments worth at base length)
+	max_segment_distance += 200.0  # Add margin
 	var min_required_length := total_length - max_segment_distance
 	
-	# Remove breadcrumbs before the required length
+	# Find how many breadcrumbs to remove
 	var remove_count := 0
 	for i in range(breadcrumb_lengths.size()):
 		if breadcrumb_lengths[i] < min_required_length:
@@ -186,18 +210,11 @@ func _cleanup_breadcrumbs() -> void:
 		else:
 			break
 	
-	# Keep at least 2 breadcrumbs
-	if remove_count > 0 and breadcrumb_positions.size() - remove_count >= 2:
-		# Remove from the start (less efficient but happens infrequently)
-		var new_positions := PackedVector2Array()
-		var new_lengths := PackedFloat32Array()
-		
-		for i in range(remove_count, breadcrumb_positions.size()):
-			new_positions.append(breadcrumb_positions[i])
-			new_lengths.append(breadcrumb_lengths[i])
-		
-		breadcrumb_positions = new_positions
-		breadcrumb_lengths = new_lengths
+	# Keep at least 10 breadcrumbs for stability
+	if remove_count > 0 and breadcrumb_positions.size() - remove_count >= 10:
+		# Use slice for better performance
+		breadcrumb_positions = breadcrumb_positions.slice(remove_count)
+		breadcrumb_lengths = breadcrumb_lengths.slice(remove_count)
 
 
 func get_segment_count() -> int:
