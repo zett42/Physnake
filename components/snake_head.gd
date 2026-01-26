@@ -199,8 +199,8 @@ func _on_body_entered( body: Node ):
 	if Global.is_game_over():
 		return
 	
-	# Check for collision with deadly walls (only in non-easy modes)
-	if body.is_in_group("deadly_wall") and Global.difficulty != Global.Difficulty.EASY:
+	# Check for collision with deadly walls
+	if body.is_in_group("deadly_wall"):
 		$OuchSound.play()
 		if poisoned_animation != null:
 			# Start animation from head (collision_index = -1)

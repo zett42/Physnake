@@ -89,7 +89,7 @@ theme_override_font_sizes/font_size = 30
 text = "GAMEPLAY: 
 Move the snake by pressing ← → ↑ ↓ keys
 and eat the green food to get score. 
-Avoid the evil 💀 stones."
+Avoid hitting walls and the evil 💀 stones. Don't bite yourself!"
 horizontal_alignment = 1
 
 [node name="AboutButton" type="Button" parent="."]
