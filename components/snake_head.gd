@@ -7,7 +7,7 @@ const SNAKE_MAX_SPEED_AUTO: float = 750  # Lower speed for automatic movement mo
 const SNAKE_ACCELERATION: float = 20
 
 const MAX_TIME_BONUS: float = 5
-const TIME_BONUS_DURATION: float = 1
+const TIME_BONUS_DURATION: float = 3.0
 
 # Joint length constants
 const JOINT_BASE_REST_LENGTH: float = 25.0  # Base rest length from joint scene
@@ -74,7 +74,7 @@ func _process( delta ):
 		poisoned_animation.update_animation(delta)
 		return
 	
-	time_bonus = maxf( 0, time_bonus - 1 / TIME_BONUS_DURATION * delta )
+	time_bonus = maxf( 0, time_bonus - MAX_TIME_BONUS / TIME_BONUS_DURATION * delta )
 	Global.time_bonus = ceili( time_bonus )
 	
 	# Check if we should spawn buffered segments based on tail movement
@@ -232,8 +232,10 @@ func _on_body_entered( body: Node ):
 		body.queue_free()
 		
 		# update score
-		Global.add_score( body.food_nutrition )
-		Global.add_bonus( ceili( time_bonus ) * body.food_nutrition )
+		var food_size_multiplier = 2.0 if body.food_size == Food.FoodSize.BIG else 1.0
+		var base_score = int(body.food_nutrition * food_size_multiplier)
+		Global.add_score( base_score )
+		Global.add_bonus( ceili( time_bonus ) * base_score )
 		
 		time_bonus = MAX_TIME_BONUS
 	
