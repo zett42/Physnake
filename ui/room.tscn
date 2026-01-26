@@ -23,6 +23,14 @@ normal = Vector2(-1, 0)
 [node name="Room" type="Node2D"]
 script = ExtResource("1_j8lbu")
 
+[node name="PlayfieldBorder" type="Line2D" parent="."]
+z_index = 11
+points = PackedVector2Array(22.0, 23.5, 1128.5, 23.5, 1128.5, 624.5, 23.5, 624.5, 23.5, 23.5)
+closed = true
+width = 3.0
+default_color = Color(0.65, 0.65, 0.65, 1.0)
+antialiased = false
+
 [node name="WallTop" type="StaticBody2D" parent="." groups=["deadly_wall"]]
 position = Vector2(556, 25)
 physics_material_override = SubResource("PhysicsMaterial_43je0")
