@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://cenyjt0ukwgr5"]
+[gd_scene load_steps=3 format=3 uid="uid://cenyjt0ukwgr5"]
 
-[ext_resource type="Script" path="res://ui/start.gd" id="1_c2p6v"]
+[ext_resource type="Script" uid="uid://dwh1hi8eg46yx" path="res://ui/start.gd" id="1_c2p6v"]
+[ext_resource type="PackedScene" uid="uid://dj2vjy4yx4b7w" path="res://ui/about.tscn" id="2_about"]
 
 [node name="Start" type="ColorRect"]
 process_mode = 3
@@ -16,8 +17,8 @@ script = ExtResource("1_c2p6v")
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_top = 116.0
-offset_bottom = 174.0
+offset_top = 75.0
+offset_bottom = 133.0
 grow_horizontal = 2
 theme_override_colors/font_color = Color(0.701961, 0.701961, 0.701961, 1)
 theme_override_font_sizes/font_size = 40
@@ -32,10 +33,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -100.0
-offset_top = -152.0
-offset_right = 100.0
-offset_bottom = -89.0
+offset_left = -104.0
+offset_top = -172.0
+offset_right = 96.0
+offset_bottom = -109.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 40
@@ -49,10 +50,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -100.0
-offset_top = -64.5
-offset_right = 100.0
-offset_bottom = -1.5
+offset_left = -104.0
+offset_top = -92.0
+offset_right = 96.0
+offset_bottom = -29.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 40
@@ -66,10 +67,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -100.0
-offset_top = 23.0
-offset_right = 100.0
-offset_bottom = 86.0
+offset_left = -104.0
+offset_top = -12.0
+offset_right = 96.0
+offset_bottom = 51.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 40
@@ -91,6 +92,25 @@ and eat the green food to get score.
 Avoid the evil 💀 stones."
 horizontal_alignment = 1
 
+[node name="AboutButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -100.0
+offset_top = -50.0
+offset_right = -10.0
+offset_bottom = -10.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 20
+text = "About"
+
+[node name="About" parent="." instance=ExtResource("2_about")]
+
 [connection signal="pressed" from="EasyButton" to="." method="_on_easy_button_pressed"]
 [connection signal="pressed" from="NormalButton" to="." method="_on_normal_button_pressed"]
 [connection signal="pressed" from="HardButton" to="." method="_on_hard_button_pressed"]
+[connection signal="pressed" from="AboutButton" to="." method="_on_about_button_pressed"]
