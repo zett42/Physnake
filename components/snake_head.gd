@@ -199,6 +199,15 @@ func _on_body_entered( body: Node ):
 	if Global.is_game_over():
 		return
 	
+	# Check for collision with deadly walls (only in non-easy modes)
+	if body.is_in_group("deadly_wall") and Global.difficulty != Global.Difficulty.EASY:
+		$OuchSound.play()
+		if poisoned_animation != null:
+			# Start animation from head (collision_index = -1)
+			poisoned_animation.start_animation(-1)
+		Global.set_game_over()
+		return
+	
 	# Check for collision with snake's own body (excluding first 2 segments)
 	if body is SnakeBody:
 		# Get all registered segments from the controller

@@ -31,7 +31,8 @@ func register_joint(joint: SnakeJoint) -> void:
 
 
 func start_animation(collision_index: int) -> void:
-	"""Start the poisoned animation from the given collision segment index."""
+	"""Start the poisoned animation from the given collision segment index.
+	Use collision_index = -1 to start the animation from the head (e.g., for wall collisions)."""
 	is_animating = true
 	collision_segment_index = collision_index
 	animation_time = 0.0
