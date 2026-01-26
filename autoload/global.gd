@@ -7,7 +7,7 @@ extends Node
 	set( value ):
 		if time_bonus != value:
 			time_bonus = value
-			var time_bonus_node = get_node("/root/Room/ScorePanel/Panel/TimeBonus")
+			var time_bonus_node = get_node("/root/Room/ScorePanel/TimeBonus")
 			if time_bonus_node:
 				time_bonus_node.text = "Time Bonus: %d" % time_bonus
 
@@ -71,7 +71,7 @@ func add_bonus( value: int ):
 
 func update_score_display():
 
-	var score_node = get_node("/root/Room/ScorePanel/Panel/Score")
+	var score_node = get_node("/root/Room/ScorePanel/Score")
 	if score_node:
 		score_node.text = "Score: %d" % total_score
 
