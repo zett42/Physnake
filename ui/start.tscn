@@ -92,6 +92,22 @@ and eat the green food to get score.
 Avoid hitting walls and the evil 💀 stones. Don't bite yourself!"
 horizontal_alignment = 1
 
+[node name="ExitButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -100.0
+offset_top = -100.0
+offset_right = -10.0
+offset_bottom = -60.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 20
+text = "Exit"
+
 [node name="AboutButton" type="Button" parent="."]
 layout_mode = 1
 anchors_preset = 3
@@ -113,4 +129,5 @@ text = "About"
 [connection signal="pressed" from="EasyButton" to="." method="_on_easy_button_pressed"]
 [connection signal="pressed" from="NormalButton" to="." method="_on_normal_button_pressed"]
 [connection signal="pressed" from="HardButton" to="." method="_on_hard_button_pressed"]
+[connection signal="pressed" from="ExitButton" to="." method="_on_exit_button_pressed"]
 [connection signal="pressed" from="AboutButton" to="." method="_on_about_button_pressed"]
