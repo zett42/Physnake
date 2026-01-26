@@ -1,0 +1,61 @@
+[gd_scene load_steps=2 format=3 uid="uid://b5qvw8yxn3cq6"]
+
+[ext_resource type="Script" path="res://ui/pause_menu.gd" id="1_pause"]
+
+[node name="PauseMenu" type="CanvasLayer"]
+process_mode = 3
+script = ExtResource("1_pause")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.7)
+
+[node name="Panel" type="Panel" parent="ColorRect"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -100.0
+offset_right = 150.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ColorRect/Panel"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="ColorRect/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "PAUSED"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ContinueButton" type="Button" parent="ColorRect/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Continue"
+
+[node name="MainMenuButton" type="Button" parent="ColorRect/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Exit to Main Menu"
+
+[node name="ExitButton" type="Button" parent="ColorRect/Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "Exit Game"
+
+[connection signal="pressed" from="ColorRect/Panel/VBoxContainer/ContinueButton" to="." method="_on_continue_button_pressed"]
+[connection signal="pressed" from="ColorRect/Panel/VBoxContainer/MainMenuButton" to="." method="_on_main_menu_button_pressed"]
+[connection signal="pressed" from="ColorRect/Panel/VBoxContainer/ExitButton" to="." method="_on_exit_button_pressed"]
