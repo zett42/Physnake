@@ -44,6 +44,10 @@ var tail_spawn_distance: float = 0.0  # Accumulated distance traveled by tail
 # Death animation
 var poisoned_animation: SnakePoisonedAnimation = null
 
+# Force-based wall collision detection
+const DEADLY_WALL_IMPACT_THRESHOLD: float = 100.0  # Minimum velocity for deadly wall impact
+var last_velocity: Vector2 = Vector2.ZERO  # Track velocity for impact detection
+
 
 func _ready():
 	
@@ -84,7 +88,12 @@ func _process( delta ):
 func _integrate_forces( _state ):
 
 	if Global.is_game_over():
+		# Store velocity even during game over for proper animation
+		last_velocity = linear_velocity
 		return
+	
+	# Track velocity for force-based collision detection
+	last_velocity = linear_velocity
 
 	if Global.auto_move:
 		# Automatic movement mode (normal/hard difficulty)
@@ -199,13 +208,20 @@ func _on_body_entered( body: Node ):
 	if Global.is_game_over():
 		return
 	
-	# Check for collision with deadly walls
+	# Check for collision with deadly walls - force-based detection
 	if body.is_in_group("deadly_wall"):
-		$OuchSound.play()
-		if poisoned_animation != null:
-			# Start animation from head (collision_index = -1)
-			poisoned_animation.start_animation(-1)
-		Global.set_game_over()
+		# Calculate impact speed from the wall's normal direction
+		# For a wall collision, check velocity magnitude perpendicular to wall
+		var impact_speed := last_velocity.length()
+		
+		# Only deadly if impact speed exceeds threshold
+		if impact_speed >= DEADLY_WALL_IMPACT_THRESHOLD:
+			$OuchSound.play()
+			if poisoned_animation != null:
+				# Start animation from head (collision_index = -1)
+				poisoned_animation.start_animation(-1)
+			Global.set_game_over()
+		# Otherwise, let physics bounce handle it naturally (gentle touch)
 		return
 	
 	# Check for collision with snake's own body (excluding first 2 segments)
