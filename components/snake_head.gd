@@ -6,6 +6,10 @@ const SNAKE_MAX_SPEED: float = 2000
 const SNAKE_MAX_SPEED_AUTO: float = 750  # Lower speed for automatic movement mode
 const SNAKE_ACCELERATION: float = 20
 
+# Force threshold for deadly wall collision
+const DEADLY_WALL_IMPACT_THRESHOLD: float = 115.0  # Minimum velocity for deadly wall impact. This is carefully tuned to allow diagonal collisions without death.
+
+# Time bonus constants
 const MAX_TIME_BONUS: float = 5
 const TIME_BONUS_DURATION: float = 3.0
 
@@ -14,7 +18,7 @@ const JOINT_BASE_REST_LENGTH: float = 25.0  # Base rest length from joint scene
 const JOINT_HEAD_BONUS: float = 4.0  # Extra length when connecting to head
 const JOINT_BIG_SEGMENT_BONUS: float = 6.0  # Extra length for big segments
 
-# Components that will be spawend.
+# Components that will be spawned.
 const body_scene  := preload("res://components/snake_body.tscn") as PackedScene
 const joint_scene := preload("res://components/snake_joint.tscn") as PackedScene
 
@@ -45,9 +49,23 @@ var tail_spawn_distance: float = 0.0  # Accumulated distance traveled by tail
 var poisoned_animation: SnakePoisonedAnimation = null
 
 # Force-based wall collision detection
-const DEADLY_WALL_IMPACT_THRESHOLD: float = 100.0  # Minimum velocity for deadly wall impact
 var last_velocity: Vector2 = Vector2.ZERO  # Track velocity for impact detection
 var last_contact_normal: Vector2 = Vector2.ZERO  # Contact normal from last collision
+
+# Wall proximity detection to prevent slowdown exploit
+const WALL_PROXIMITY_DISTANCE: float = 50.0  # Distance to check for nearby walls
+const WALL_COLLISION_LAYER: int = 1  # Walls are on layer 1
+const WALL_SLIDING_DISTANCE_BUFFER: float = 2.0  # Extra distance beyond head radius for sliding activation
+const WALL_SLIDING_VELOCITY_THRESHOLD: float = 150.0  # Max velocity toward wall to trigger parallel sliding
+const MIN_PARALLEL_COMPONENT_LENGTH_SQ: float = 0.001  # Minimum parallel component magnitude squared
+const INPUT_DIRECTION_THRESHOLD: float = 0.05  # Minimum input to detect directional intent
+var wall_raycast_up: RayCast2D
+var wall_raycast_down: RayCast2D
+var wall_raycast_left: RayCast2D
+var wall_raycast_right: RayCast2D
+
+# Head collision radius (retrieved from collision shape)
+var head_radius: float = 15.0
 
 
 func _ready():
@@ -62,6 +80,11 @@ func _ready():
 	contact_monitor = true
 	max_contacts_reported = 4
 	
+	# Get head radius from collision shape
+	var collision_shape := $CollisionShape2D
+	if collision_shape and collision_shape.shape is CircleShape2D:
+		head_radius = (collision_shape.shape as CircleShape2D).radius
+	
 	# Create and initialize the snake controller
 	controller = SnakeController.new()
 	add_child(controller)
@@ -71,6 +94,9 @@ func _ready():
 	poisoned_animation = SnakePoisonedAnimation.new()
 	add_child(poisoned_animation)
 	poisoned_animation.initialize(self, controller)
+	
+	# Setup wall proximity detection raycasts
+	_setup_wall_proximity_raycasts()
 
 	# Add initial snake tail. As tree is locked in _ready(), it must be called deferred.
 	call_deferred( "_spawn_tail", Food.FoodSize.NORMAL )
@@ -148,6 +174,8 @@ func _handle_automatic_movement(delta: float):
 			new_direction = new_direction.normalized()
 			# Prevent turning 180 degrees (opposite direction)
 			if new_direction.dot(current_direction) > -0.9:  # Not opposite (allowing some tolerance)
+				# Adjust direction if near wall to prevent slowdown exploit
+				new_direction = _adjust_direction_for_wall_proximity(new_direction)
 				current_direction = new_direction
 				# Reset boost timer when direction changes
 				boost_hold_time = 0.0
@@ -189,8 +217,11 @@ func _handle_automatic_movement(delta: float):
 	elif current_speed > target_speed:
 		current_speed = maxf(current_speed - SNAKE_ACCELERATION, target_speed)
 	
-	# Always move in the current direction
-	apply_central_force(current_direction.normalized() * current_speed)
+	# Check if we should adjust direction for wall sliding (continuous check)
+	var final_direction := _adjust_direction_for_wall_sliding(current_direction)
+	
+	# Always move in the final direction
+	apply_central_force(final_direction.normalized() * current_speed)
 
 
 func _handle_manual_movement():
@@ -392,3 +423,125 @@ func _add_joint( body1: PhysicsBody2D, body2: PhysicsBody2D, rest_length: float 
 	# Track the joint for death animation
 	if poisoned_animation != null:
 		poisoned_animation.register_joint(joint)
+
+
+func _setup_wall_proximity_raycasts():
+	"""Setup raycasts for detecting nearby walls in all 4 directions."""
+	
+	# Create raycasts for each cardinal direction
+	# Only detect walls on layer 1 for efficient filtering
+	wall_raycast_up = RayCast2D.new()
+	wall_raycast_up.target_position = Vector2(0, -WALL_PROXIMITY_DISTANCE)
+	wall_raycast_up.collision_mask = WALL_COLLISION_LAYER
+	wall_raycast_up.enabled = true
+	add_child(wall_raycast_up)
+	
+	wall_raycast_down = RayCast2D.new()
+	wall_raycast_down.target_position = Vector2(0, WALL_PROXIMITY_DISTANCE)
+	wall_raycast_down.collision_mask = WALL_COLLISION_LAYER
+	wall_raycast_down.enabled = true
+	add_child(wall_raycast_down)
+	
+	wall_raycast_left = RayCast2D.new()
+	wall_raycast_left.target_position = Vector2(-WALL_PROXIMITY_DISTANCE, 0)
+	wall_raycast_left.collision_mask = WALL_COLLISION_LAYER
+	wall_raycast_left.enabled = true
+	add_child(wall_raycast_left)
+	
+	wall_raycast_right = RayCast2D.new()
+	wall_raycast_right.target_position = Vector2(WALL_PROXIMITY_DISTANCE, 0)
+	wall_raycast_right.collision_mask = WALL_COLLISION_LAYER
+	wall_raycast_right.enabled = true
+	add_child(wall_raycast_right)
+
+
+func _adjust_direction_for_wall_proximity(desired_direction: Vector2) -> Vector2:
+	"""
+	Adjust the desired direction if it would move toward a nearby wall.
+	When approaching a wall, creates a diagonal. This is called on input changes.
+	"""
+	
+	# Only apply this adjustment in auto-move mode
+	if not Global.auto_move:
+		return desired_direction
+	
+	# Check if the desired direction would move toward a nearby wall
+	var wall_detected := false
+	var parallel_component := Vector2.ZERO
+	
+	# Check vertical walls (top/bottom) - parallel movement is horizontal
+	if desired_direction.y < -INPUT_DIRECTION_THRESHOLD and wall_raycast_up.is_colliding():
+		wall_detected = true
+		parallel_component = Vector2(current_direction.x, 0)
+	elif desired_direction.y > INPUT_DIRECTION_THRESHOLD and wall_raycast_down.is_colliding():
+		wall_detected = true
+		parallel_component = Vector2(current_direction.x, 0)
+	
+	# Check horizontal walls (left/right) - parallel movement is vertical
+	if desired_direction.x < -INPUT_DIRECTION_THRESHOLD and wall_raycast_left.is_colliding():
+		wall_detected = true
+		parallel_component = Vector2(0, current_direction.y)
+	elif desired_direction.x > INPUT_DIRECTION_THRESHOLD and wall_raycast_right.is_colliding():
+		wall_detected = true
+		parallel_component = Vector2(0, current_direction.y)
+	
+	# If no wall detected in the desired direction, allow the direction change
+	if not wall_detected:
+		return desired_direction
+	
+	# Wall nearby: blend to create diagonal for approach
+	# Normalize parallel component, using sensible fallback if zero
+	if parallel_component.length_squared() < MIN_PARALLEL_COMPONENT_LENGTH_SQ:
+		# If no clear parallel direction, use perpendicular to the wall-directed axis
+		if abs(desired_direction.y) > 0.5:  # Vertical wall-directed input
+			parallel_component = Vector2(1.0, 0)
+		else:  # Horizontal wall-directed input
+			parallel_component = Vector2(0, 1.0)
+	else:
+		parallel_component = parallel_component.normalized()
+	
+	# Blend desired direction with parallel component to create stable diagonal
+	var adjusted_direction = (desired_direction + parallel_component).normalized()
+	
+	# If the desired direction was diagonal (both x and y components present), 
+	# ensure the result is also a proper 45° diagonal
+	if abs(desired_direction.x) > 0.1 and abs(desired_direction.y) > 0.1:
+		# Make it a proper 45° diagonal by equalizing the components
+		var sign_x = sign(adjusted_direction.x) if abs(adjusted_direction.x) > 0.01 else 1.0
+		var sign_y = sign(adjusted_direction.y) if abs(adjusted_direction.y) > 0.01 else 1.0
+		adjusted_direction = Vector2(sign_x, sign_y).normalized()
+	
+	return adjusted_direction
+
+
+func _adjust_direction_for_wall_sliding(movement_direction: Vector2) -> Vector2:
+	"""
+	Continuously adjust movement direction when sliding along walls.
+	This prevents slowdown by switching to pure parallel movement when touching a wall.
+	"""
+	
+	# Only apply this adjustment in auto-move mode
+	if not Global.auto_move:
+		return movement_direction
+	
+	# Check each wall direction
+	var checks := [
+		{"dir": Vector2.UP, "raycast": wall_raycast_up, "input_check": movement_direction.y < -INPUT_DIRECTION_THRESHOLD, "parallel": Vector2(movement_direction.x, 0)},
+		{"dir": Vector2.DOWN, "raycast": wall_raycast_down, "input_check": movement_direction.y > INPUT_DIRECTION_THRESHOLD, "parallel": Vector2(movement_direction.x, 0)},
+		{"dir": Vector2.LEFT, "raycast": wall_raycast_left, "input_check": movement_direction.x < -INPUT_DIRECTION_THRESHOLD, "parallel": Vector2(0, movement_direction.y)},
+		{"dir": Vector2.RIGHT, "raycast": wall_raycast_right, "input_check": movement_direction.x > INPUT_DIRECTION_THRESHOLD, "parallel": Vector2(0, movement_direction.y)}
+	]
+	
+	for check in checks:
+		if check["input_check"] and check["raycast"].is_colliding():
+			var collision_point = check["raycast"].get_collision_point()
+			var wall_distance = global_position.distance_to(collision_point)
+			
+			if wall_distance < head_radius + WALL_SLIDING_DISTANCE_BUFFER:
+				var parallel_component: Vector2 = check["parallel"]
+				if parallel_component.length_squared() > MIN_PARALLEL_COMPONENT_LENGTH_SQ:
+					var velocity_toward_wall := last_velocity.dot(check["dir"])
+					if velocity_toward_wall < WALL_SLIDING_VELOCITY_THRESHOLD:
+						return parallel_component.normalized()
+	
+	return movement_direction

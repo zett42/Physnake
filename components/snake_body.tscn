@@ -1,7 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://cuglu471ws0bq"]
+[gd_scene load_steps=6 format=3 uid="uid://cuglu471ws0bq"]
 
 [ext_resource type="Script" path="res://components/snake_body.gd" id="1_hlygk"]
 [ext_resource type="Script" path="res://shapes/visible_circle_shape_2d.gd" id="3_i3tf7"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_frictionless"]
+friction = 0.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_kke47"]
 radius = 12.0
@@ -10,6 +13,9 @@ radius = 12.0
 radius = 18.0
 
 [node name="SnakeBody" type="RigidBody2D" groups=["apply_explosion", "snake", "snake_body"]]
+collision_layer = 4
+collision_mask = 15
+physics_material_override = SubResource("PhysicsMaterial_frictionless")
 mass = 0.01
 linear_damp = 2.0
 script = ExtResource("1_hlygk")

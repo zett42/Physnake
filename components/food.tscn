@@ -7,6 +7,8 @@
 
 [node name="Food" type="RigidBody2D" groups=["apply_explosion", "food"]]
 modulate = Color(0.235294, 1, 0, 1)
+collision_layer = 8
+collision_mask = 15
 mass = 0.05
 gravity_scale = 0.0
 script = ExtResource("1_f1o5r")
