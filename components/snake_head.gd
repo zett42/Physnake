@@ -47,6 +47,7 @@ var poisoned_animation: SnakePoisonedAnimation = null
 # Force-based wall collision detection
 const DEADLY_WALL_IMPACT_THRESHOLD: float = 100.0  # Minimum velocity for deadly wall impact
 var last_velocity: Vector2 = Vector2.ZERO  # Track velocity for impact detection
+var last_contact_normal: Vector2 = Vector2.ZERO  # Contact normal from last collision
 
 
 func _ready():
@@ -56,6 +57,10 @@ func _ready():
 	
 	# Enable Continuous Collision Detection for fast movement
 	continuous_cd = RigidBody2D.CCD_MODE_CAST_RAY
+	
+	# Enable contact monitoring for collision normal detection
+	contact_monitor = true
+	max_contacts_reported = 4
 	
 	# Create and initialize the snake controller
 	controller = SnakeController.new()
@@ -85,7 +90,7 @@ func _process( delta ):
 	_check_tail_spawning()
 
 
-func _integrate_forces( _state ):
+func _integrate_forces( state: PhysicsDirectBodyState2D ):
 
 	if Global.is_game_over():
 		# Store velocity even during game over for proper animation
@@ -94,10 +99,17 @@ func _integrate_forces( _state ):
 	
 	# Track velocity for force-based collision detection
 	last_velocity = linear_velocity
+	
+	# Get contact normal from physics state for accurate collision detection
+	last_contact_normal = Vector2.ZERO
+	var contact_count := state.get_contact_count()
+	if contact_count > 0:
+		# Use the first contact's normal (or could iterate to find strongest)
+		last_contact_normal = state.get_contact_local_normal(0)
 
 	if Global.auto_move:
 		# Automatic movement mode (normal/hard difficulty)
-		_handle_automatic_movement(_state.step)
+		_handle_automatic_movement(state.step)
 	else:
 		# Manual movement mode (easy difficulty)
 		_handle_manual_movement()
@@ -210,11 +222,13 @@ func _on_body_entered( body: Node ):
 	
 	# Check for collision with deadly walls - force-based detection
 	if body.is_in_group("deadly_wall"):
-		# Calculate impact speed from the wall's normal direction
-		# For a wall collision, check velocity magnitude perpendicular to wall
-		var impact_speed := last_velocity.length()
+		# Use the contact normal from physics state to calculate perpendicular impact.
+		# This way a slight touch will not be deadly.
+		# The normal points from the wall into this body.
+		var wall_normal: Vector2 = last_contact_normal	
+		var perpendicular_velocity: float = last_velocity.dot(wall_normal)
+		var impact_speed: float = abs(perpendicular_velocity)
 		
-		# Only deadly if impact speed exceeds threshold
 		if impact_speed >= DEADLY_WALL_IMPACT_THRESHOLD:
 			$OuchSound.play()
 			if poisoned_animation != null:
@@ -254,7 +268,7 @@ func _on_body_entered( body: Node ):
 		Global.add_bonus( ceili( time_bonus ) * base_score )
 		
 		time_bonus = MAX_TIME_BONUS
-	
+
 
 func _buffer_food( food_size: Food.FoodSize, food_nutrition: int = 1 ):
 	"""Buffer eaten food for later spawning."""
