@@ -31,8 +31,11 @@ var tail: PhysicsBody2D = self
 # Current snake speed
 var current_speed: float = SNAKE_MIN_SPEED
 
+## Initial movement direction of the snake (used in automatic movement).
+@export var start_direction: Vector2 = Vector2.RIGHT
+
 # Current direction for automatic movement mode (absolute directions)
-var current_direction: Vector2 = Vector2.RIGHT
+@onready var current_direction: Vector2 = start_direction.normalized() if start_direction != Vector2.ZERO else Vector2.RIGHT
 
 # Boost mechanic for automatic movement
 var boost_hold_time: float = 0.0  # Time keys matching direction have been held
@@ -374,13 +377,17 @@ func _spawn_tail( food_size: Food.FoodSize, spawn_position: Vector2 = Vector2.ZE
 	else:
 		new_tail.body_size = SnakeBody.BodySize.BIG	
 
-	# Use stored spawn position or fall back to tail position with offset
+	# Use stored spawn position (when food was eaten) if provided
 	if spawn_position != Vector2.ZERO:
 		new_tail.position = spawn_position
 	else:
-		# Fallback for initial segment (backward compatibility)
-		var angle := randf_range( 0, TAU )
-		var offset := Vector2( cos( angle ), sin( angle ) )
+		# Place the first segment behind the head based on start_direction
+		var offset: Vector2
+		if tail == self and start_direction != Vector2.ZERO:
+			offset = -start_direction.normalized() * joint_len
+		else:
+			var angle := randf_range( 0, TAU )
+			offset = Vector2( cos( angle ), sin( angle ) )
 		new_tail.position = tail.position + offset
 
 	get_tree().current_scene.add_child( new_tail )

@@ -83,7 +83,8 @@ position = Vector2(647, -292)
 obstacle_size = 0
 
 [node name="SnakeHead" parent="." instance=ExtResource("2_7q88p")]
-position = Vector2(152, 248)
+position = Vector2(1064, 248)
+start_direction = Vector2(-1, 0)
 
 [node name="FriendlyObstacle1" parent="." instance=ExtResource("3_mlu37")]
 position = Vector2(369, 359)
