@@ -10,6 +10,8 @@ func _ready():
 func _input(event):
 	# Handle ESC key to toggle pause
 	if event.is_action_pressed("ui_cancel"):  # ESC key is mapped to ui_cancel by default
+		if Global.is_game_over():
+			return
 		toggle_pause()
 
 func toggle_pause():
