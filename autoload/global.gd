@@ -87,4 +87,5 @@ func _on_game_over_timer_timeout():
 	
 	get_tree().paused = true
 
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	get_tree().root.add_child( preload("res://ui/game_over.tscn").instantiate() )

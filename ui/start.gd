@@ -1,6 +1,10 @@
 extends ColorRect
 
 
+func _ready():
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+
+
 func _on_easy_button_pressed():
 	
 	Global.difficulty = Global.Difficulty.EASY

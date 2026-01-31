@@ -19,6 +19,7 @@ func toggle_pause():
 		pause_game()
 
 func pause_game():
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	get_tree().paused = true
 	show()
 	# Fade in
@@ -31,6 +32,7 @@ func fade_out_and_resume():
 	tween.tween_property(color_rect, "modulate:a", 0.0, 0.2)
 	await tween.finished
 	get_tree().paused = false
+	Input.set_mouse_mode(Input.MOUSE_MODE_HIDDEN)
 	hide()
 
 func resume_without_fade():
