@@ -7,6 +7,12 @@ extends Node
 const GRAY_COLOR: Color = Color(0.5, 0.5, 0.5, 1.0)
 
 @export var animation_duration: float = 1.0
+@export var shake_amplitude: float = 3.0
+@export var shake_frequency: float = 20.0
+@export var jitter_frequency_min: float = 0.85
+@export var jitter_frequency_max: float = 2.5
+@export var jitter_wobble_amplitude: float = 0.4
+@export var jitter_wobble_frequency: float = 2.9
 
 # Animation state
 var is_animating: bool = false
@@ -60,6 +66,7 @@ func update_animation(delta: float) -> void:
 	
 	# Fade head (treat as index -1)
 	_fade_segment_to_gray(snake_head, -1, current_spread, collision_segment_index)
+	_shake_segment(snake_head, -1, current_spread, collision_segment_index)
 	
 	# Fade body segments
 	if snake_controller != null:
@@ -67,6 +74,7 @@ func update_animation(delta: float) -> void:
 			var segment := snake_controller.segments[i]
 			if is_instance_valid(segment):
 				_fade_segment_to_gray(segment, i, current_spread, collision_segment_index)
+				_shake_segment(segment, i, current_spread, collision_segment_index)
 	
 	# Fade joints (joint i connects segment i-1 to segment i, or head to segment 0)
 	for i in range(joints.size()):
@@ -74,6 +82,7 @@ func update_animation(delta: float) -> void:
 		if is_instance_valid(joint):
 			# Joint connects to segment at index i, so use that segment's index for fade calculation
 			_fade_joint_to_gray(joint, i, current_spread, collision_segment_index)
+			_shake_joint(joint, i, current_spread, collision_segment_index)
 
 
 func _fade_segment_to_gray(segment: Node2D, segment_index: int, current_spread: float, collision_index: int):
@@ -111,6 +120,10 @@ func _fade_segment_to_gray(segment: Node2D, segment_index: int, current_spread: 
 					var original_color: Color = fill.get_meta("original_color")
 					# Lerp from original color to gray
 					fill.color = original_color.lerp(GRAY_COLOR, fade_amount)
+			else:
+				_restore_shake_offset(segment)
+	else:
+		_restore_shake_offset(segment)
 
 
 func _fade_joint_to_gray(joint: SnakeJoint, joint_index: int, current_spread: float, collision_index: int):
@@ -137,6 +150,73 @@ func _fade_joint_to_gray(joint: SnakeJoint, joint_index: int, current_spread: fl
 			var original_color: Color = line.get_meta("original_color")
 			# Lerp from original color to gray
 			line.default_color = original_color.lerp(GRAY_COLOR, fade_amount)
+	else:
+		_restore_shake_offset(joint)
+
+
+func _shake_segment(segment: Node2D, segment_index: int, current_spread: float, collision_index: int) -> void:
+	"""Apply shake to a segment based on the same spread used for color fade."""
+	var fade_amount: float = _compute_fade_amount(segment_index, current_spread, collision_index)
+	if fade_amount <= 0.0:
+		_restore_shake_offset(segment)
+		return
+
+	var decay: float = 1.0 - clamp(animation_time / animation_duration, 0.0, 1.0)
+	var intensity: float = fade_amount * decay
+	var jitter_seed: float = float(segment_index + 2) * 19.19
+	var phase_jitter: float = _hash1(jitter_seed) * TAU
+	var freq_jitter: float = lerp(jitter_frequency_min, jitter_frequency_max, _hash1(jitter_seed + 31.7))
+	var wobble: float = sin(animation_time * jitter_wobble_frequency + jitter_seed) * jitter_wobble_amplitude
+	var phase: float = (animation_time * shake_frequency * freq_jitter) + phase_jitter + wobble
+	var offset := Vector2(sin(phase), cos(phase * 0.9 + phase_jitter * 0.3)) * (shake_amplitude * intensity)
+	_apply_shake_offset(segment, offset)
+
+
+func _shake_joint(joint: SnakeJoint, joint_index: int, current_spread: float, collision_index: int) -> void:
+	"""Apply shake to a joint line to match the segment shake timing."""
+	if not joint.has_node("Line"):
+		return
+
+	var fade_amount: float = _compute_fade_amount(joint_index, current_spread, collision_index)
+	if fade_amount <= 0.0:
+		_restore_shake_offset(joint)
+		return
+
+	var decay: float = 1.0 - clamp(animation_time / animation_duration, 0.0, 1.0)
+	var intensity: float = fade_amount * decay
+	var jitter_seed: float = float(joint_index + 5) * 17.77
+	var phase_jitter: float = _hash1(jitter_seed) * TAU
+	var freq_jitter: float = lerp(jitter_frequency_min, jitter_frequency_max, _hash1(jitter_seed + 13.3))
+	var wobble: float = sin(animation_time * (jitter_wobble_frequency + 0.2) + jitter_seed) * (jitter_wobble_amplitude * 0.875)
+	var phase: float = (animation_time * shake_frequency * freq_jitter) + phase_jitter + wobble
+	var offset := Vector2(sin(phase * 1.1), cos(phase + phase_jitter * 0.2)) * (shake_amplitude * 0.6 * intensity)
+	_apply_shake_offset(joint, offset)
+
+
+func _compute_fade_amount(index: int, current_spread: float, collision_index: int) -> float:
+	var distance_from_collision: float = abs(index - collision_index)
+	if current_spread < distance_from_collision:
+		return 0.0
+	var overshoot: float = current_spread - distance_from_collision
+	return clamp(overshoot, 0.0, 1.0)
+
+
+func _hash1(value: float) -> float:
+	var s: float = sin(value) * 43758.5453
+	return s - floor(s)
+
+
+func _apply_shake_offset(node: Node2D, offset: Vector2) -> void:
+	if not node.has_meta("original_position"):
+		node.set_meta("original_position", node.position)
+
+	var original_position: Vector2 = node.get_meta("original_position")
+	node.position = original_position + offset
+
+
+func _restore_shake_offset(node: Node2D) -> void:
+	if node != null and node.has_meta("original_position"):
+		node.position = node.get_meta("original_position")
 
 
 
