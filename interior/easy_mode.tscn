@@ -5,4 +5,4 @@
 [node name="Interior" type="Node2D"]
 
 [node name="SnakeHead" parent="." instance=ExtResource("1_easy")]
-position = Vector2(585, 320)
+position = Vector2(128, 320)

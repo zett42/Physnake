@@ -137,10 +137,10 @@ func _integrate_forces( state: PhysicsDirectBodyState2D ):
 		last_contact_normal = state.get_contact_local_normal(0)
 
 	if Global.auto_move:
-		# Automatic movement mode (normal/hard difficulty)
+		# Automatic movement mode
 		_handle_automatic_movement(state.step)
 	else:
-		# Manual movement mode (easy difficulty)
+		# Manual movement mode
 		_handle_manual_movement()
 
 
