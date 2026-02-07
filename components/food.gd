@@ -50,3 +50,26 @@ func _setup_tail_count_rings(parent_node: Node2D, base_radius: float):
 		parent_node.add_child(ring)
 		# Must call update after adding to tree to generate the polygons
 		ring.update_polygon_nodes()
+
+
+func play_collection_effect():
+	"""Play particle effect when food is collected. Should be called before queue_free()."""
+
+	# Scale particle effect based on food size and nutrition
+	var size_multiplier = 1.5 if food_size == FoodSize.BIG else 1.0
+	var nutrition_multiplier = 1.0 + (food_nutrition - 1) * 0.3  # +30% per extra nutrition
+	var total_multiplier = size_multiplier * nutrition_multiplier
+
+	var particles := $CollectionParticles
+	particles.amount = int(60 * total_multiplier)
+	particles.scale = Vector2.ONE * (0.8 + (total_multiplier - 1.0) * 0.4)  # Slightly bigger visual size
+
+	# Detach particles from food and reparent to scene root so they persist after food is freed
+	remove_child(particles)
+	get_tree().current_scene.add_child(particles)
+	particles.global_position = global_position
+	particles.modulate = modulate  # Transfer food color to particles
+	particles.emitting = true
+
+	# Auto-cleanup after particles finish
+	particles.finished.connect(func(): particles.queue_free())

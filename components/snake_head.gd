@@ -288,7 +288,10 @@ func _on_body_entered( body: Node ):
 	if body.is_in_group("food"):
 		
 		$EatSound.play()
-		
+
+		# Trigger food's collection effect before removing it
+		body.play_collection_effect()
+
 		# Buffer the food for later spawning of snake segment
 		call_deferred( "_buffer_food", body.food_size, body.food_nutrition )
 		

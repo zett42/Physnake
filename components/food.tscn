@@ -1,9 +1,30 @@
-[gd_scene load_steps=5 format=3 uid="uid://dquwc4k5ry86e"]
+[gd_scene load_steps=9 format=3 uid="uid://dquwc4k5ry86e"]
 
 [ext_resource type="Script" path="res://components/food.gd" id="1_f1o5r"]
 [ext_resource type="Script" path="res://shapes/visible_circle_shape_2d.gd" id="2_ow17t"]
+[ext_resource type="Texture2D" uid="uid://blfaw33phlfd5" path="res://sprites/explosion_particle.png" id="3_particle"]
 [ext_resource type="Shape2D" uid="uid://byqfqg6j24gi7" path="res://components/food_collision_shape_normal.tres" id="4_l6x26"]
 [ext_resource type="Shape2D" uid="uid://b0xy0u51igvte" path="res://components/food_collision_shape_big.tres" id="5_t5j03"]
+
+[sub_resource type="Gradient" id="Gradient_food"]
+interpolation_mode = 2
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_food"]
+gradient = SubResource("Gradient_food")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_food"]
+lifetime_randomness = 0.25
+particle_flag_disable_z = true
+spread = 180.0
+initial_velocity_min = 60.0
+initial_velocity_max = 150.0
+gravity = Vector3(0, 0, 0)
+damping_min = 50.0
+damping_max = 80.0
+scale_min = 0.3
+scale_max = 1.2
+color_ramp = SubResource("GradientTexture1D_food")
 
 [node name="Food" type="RigidBody2D" groups=["apply_explosion", "food"]]
 modulate = Color(0.235294, 1, 0, 1)
@@ -43,3 +64,12 @@ shape = ExtResource("4_l6x26")
 [node name="CollisionShape_big" type="CollisionShape2D" parent="."]
 visible = false
 shape = ExtResource("5_t5j03")
+
+[node name="CollectionParticles" type="GPUParticles2D" parent="."]
+emitting = false
+amount = 60
+process_material = SubResource("ParticleProcessMaterial_food")
+texture = ExtResource("3_particle")
+lifetime = 0.5
+one_shot = true
+explosiveness = 0.65
