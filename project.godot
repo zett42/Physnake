@@ -18,6 +18,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 Global="*res://autoload/global.tscn"
+HighScore="*res://autoload/highscore.gd"
 
 [display]
 

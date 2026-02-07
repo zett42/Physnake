@@ -76,19 +76,53 @@ grow_vertical = 2
 theme_override_font_sizes/font_size = 40
 text = "HARD"
 
+[node name="HighScoresContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 840.0
+offset_top = 136.0
+offset_bottom = 328.0
+grow_horizontal = 2
+alignment = 1
+
+[node name="HighScoresTitle" type="Label" parent="HighScoresContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 24
+text = "HIGH SCORES:"
+
+[node name="EasyHighScore" type="Label" parent="HighScoresContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 18
+text = "EASY: ---"
+
+[node name="NormalHighScore" type="Label" parent="HighScoresContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 18
+text = "NORMAL: ---"
+
+[node name="HardHighScore" type="Label" parent="HighScoresContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 18
+text = "HARD: ---"
+
 [node name="ControlsLabel" type="Label" parent="."]
 modulate = Color(0.741176, 0.741176, 0.741176, 1)
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
 offset_left = -20.5
-offset_top = 392.0
+offset_top = 410.0
 offset_right = 20.5
 offset_bottom = 630.0
 grow_horizontal = 2
 theme_override_colors/font_color = Color(0.701961, 0.701961, 0.701961, 1)
 theme_override_font_sizes/font_size = 30
-text = "Control the snake with ← → ↑ ↓.
+text = "Control the snake with ← → ↑ ↓. Hold for boost.
 Eat green food to score points and grow.
 Avoid the nasty 💀 stones — they’re in a really bad mood.
 Be kind to yourself — your tail is not food.
