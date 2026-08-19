@@ -61,7 +61,7 @@ func _on_exit_button_pressed():
 
 
 func _on_settings_button_pressed():
-	get_tree().change_scene_to_file("res://ui/settings.tscn")
+	get_tree().change_scene_to_file("res://ui/settings_page.tscn")
 
 
 func _on_about_button_pressed():

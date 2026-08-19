@@ -1,6 +1,8 @@
 extends Node
 
 
+const SettingsManager = preload("res://autoload/settings_manager.gd")
+
 @export var time_bonus: int = 0:
 	get:
 		return time_bonus
@@ -26,7 +28,12 @@ var total_score: int = 0
 var total_bonus: int = 0
 
 var _is_game_over: bool = false
+var settings := SettingsManager.new()
 
+
+func _ready():
+	settings.load_settings()
+	settings.apply_startup_settings()
 
 
 func reset_game_state():
@@ -86,3 +93,11 @@ func _on_game_over_timer_timeout():
 
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	get_tree().root.add_child( preload("res://ui/game_over.tscn").instantiate() )
+
+
+func is_fullscreen_enabled() -> bool:
+	return settings.fullscreen
+
+
+func set_fullscreen(enabled: bool):
+	settings.set_fullscreen(enabled)
