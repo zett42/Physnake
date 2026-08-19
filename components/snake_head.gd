@@ -43,7 +43,7 @@ var boost_hold_time: float = 0.0  # Time keys matching direction have been held
 const BOOST_DELAY: float = 0.25  # Delay before boost activates (in seconds)
 
 # Time bonus if snake eats food quickly.
-var time_bonus: float = MAX_TIME_BONUS
+var time_bonus: float = 0.0
 
 # Food digestion buffer for natural segment spawning
 var food_buffer: Array[Dictionary] = []  # Stores {food_size: Food.FoodSize, tail_position: Vector2}
