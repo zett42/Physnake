@@ -1,8 +1,8 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://colfroastxp3e"]
 
-[ext_resource type="Script" path="res://ui/game_over.gd" id="1_sa6xy"]
+[ext_resource type="Script" uid="uid://b5gkf07w0q6xx" path="res://ui/game_over.gd" id="1_sa6xy"]
 
-[node name="GameOver" type="ColorRect"]
+[node name="GameOver" type="ColorRect" unique_id=1446831073]
 process_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -12,7 +12,7 @@ grow_vertical = 2
 color = Color(0.141176, 0.141176, 0.141176, 0.592157)
 script = ExtResource("1_sa6xy")
 
-[node name="Label" type="Label" parent="."]
+[node name="Label" type="Label" parent="." unique_id=953259975]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -20,15 +20,15 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -287.0
-offset_top = -252.0
+offset_top = -278.0
 offset_right = 287.0
-offset_bottom = -112.0
+offset_bottom = -138.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 100
 text = "GAME OVER"
 
-[node name="Score" type="Label" parent="."]
+[node name="Score" type="Label" parent="." unique_id=904370393]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -36,16 +36,16 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -276.0
-offset_top = -98.0
+offset_top = -150.0
 offset_right = 282.0
-offset_bottom = -22.0
+offset_bottom = -74.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 50
 text = "score:"
 horizontal_alignment = 1
 
-[node name="Bonus" type="Label" parent="."]
+[node name="Bonus" type="Label" parent="." unique_id=799534783]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -53,33 +53,50 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -276.0
-offset_top = -24.0
+offset_top = -71.0
 offset_right = 282.0
-offset_bottom = 36.0
+offset_bottom = -11.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 35
 text = "bonus:"
 horizontal_alignment = 1
 
-[node name="SnakeLength" type="Label" parent="."]
+[node name="SnakeLength" type="Label" parent="." unique_id=1105896009]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -276.0
-offset_top = 28.0
-offset_right = 282.0
-offset_bottom = 88.0
+offset_left = -272.0
+offset_top = 34.0
+offset_right = 286.0
+offset_bottom = 94.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 35
 text = "snake length:"
 horizontal_alignment = 1
 
-[node name="AvgSpeed" type="Label" parent="."]
+[node name="GoldenScore" type="Label" parent="." unique_id=1417573369]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -275.0
+offset_top = -18.0
+offset_right = 283.0
+offset_bottom = 42.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 35
+text = "golden food score:"
+horizontal_alignment = 1
+
+[node name="AvgSpeed" type="Label" parent="." unique_id=1091501684]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -87,16 +104,16 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -276.0
-offset_top = 80.0
+offset_top = 85.0
 offset_right = 282.0
-offset_bottom = 140.0
+offset_bottom = 145.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 35
 text = "avg speed:"
 horizontal_alignment = 1
 
-[node name="Difficulty" type="Label" parent="."]
+[node name="Difficulty" type="Label" parent="." unique_id=728693578]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -104,16 +121,16 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -276.0
-offset_top = 132.0
+offset_top = 137.0
 offset_right = 282.0
-offset_bottom = 192.0
+offset_bottom = 197.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 35
 text = "difficulty:"
 horizontal_alignment = 1
 
-[node name="Button" type="Button" parent="."]
+[node name="Button" type="Button" parent="." unique_id=1636724088]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -121,9 +138,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -121.5
-offset_top = 220.0
+offset_top = 225.0
 offset_right = 121.5
-offset_bottom = 283.0
+offset_bottom = 288.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 40

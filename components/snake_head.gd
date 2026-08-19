@@ -379,6 +379,8 @@ func _on_body_entered( body: Node ):
 		# update score
 		Global.add_score( base_score )
 		Global.add_bonus( bonus_score )
+		if is_golden_food:
+			Global.add_golden_score( awarded_points )
 		
 		time_bonus = MAX_TIME_BONUS
 		time_bonus_indicator.set_bonus_segments(controller.segments, time_bonus)

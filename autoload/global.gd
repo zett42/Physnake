@@ -24,6 +24,7 @@ enum Difficulty {
 
 var total_score: int = 0
 var total_bonus: int = 0
+var total_golden_score: int = 0
 var total_head_distance: float = 0.0
 var play_time: float = 0.0
 
@@ -55,6 +56,7 @@ func reset_game_state():
 	_is_game_over = false
 	total_score = 0
 	total_bonus = 0
+	total_golden_score = 0
 	total_head_distance = 0.0
 	play_time = 0.0
 	update_speed_display()
@@ -68,6 +70,11 @@ func get_total_score():
 func get_total_bonus():
 
 	return total_bonus
+
+
+func get_total_golden_score():
+
+	return total_golden_score
 
 
 func get_total_head_distance() -> float:
@@ -116,6 +123,11 @@ func add_bonus( value: int ):
 	total_score += value
 
 	update_score_display()
+
+
+func add_golden_score( value: int ):
+
+	total_golden_score += value
 
 
 func update_score_display():

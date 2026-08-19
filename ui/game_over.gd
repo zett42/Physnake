@@ -4,6 +4,7 @@ func _ready():
 
 	$Score.text = "total score: %d" % Global.get_total_score()
 	$Bonus.text = "bonus score: %d" % Global.get_total_bonus()
+	$GoldenScore.text = "golden food score: %d" % Global.get_total_golden_score()
 	$SnakeLength.text = "snake length: %d" % (Global.get_total_score() - Global.get_total_bonus() + 1)
 	$AvgSpeed.text = "avg speed: %.0f" % Global.get_average_speed()
 	$Difficulty.text = "difficulty: %s" % Global.get_difficulty_name(Global.difficulty)
