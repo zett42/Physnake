@@ -128,6 +128,14 @@ func set_detail_level(level: SettingsManager.DetailLevel):
 		detail_level_changed.emit(settings.detail_level)
 
 
+func get_antialiasing_level() -> SettingsManager.AntialiasingLevel:
+	return settings.antialiasing_level
+
+
+func set_antialiasing_level(level: SettingsManager.AntialiasingLevel):
+	settings.set_antialiasing_level(level)
+
+
 func _save_window_bounds():
 	settings.set_window_bounds(
 		DisplayServer.window_get_position_with_decorations(),

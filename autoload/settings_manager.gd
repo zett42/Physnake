@@ -10,12 +10,20 @@ enum DetailLevel {
 	HIGH,
 }
 
+enum AntialiasingLevel {
+	OFF = Viewport.MSAA_DISABLED,
+	MSAA_2X = Viewport.MSAA_2X,
+	MSAA_4X = Viewport.MSAA_4X,
+	MSAA_8X = Viewport.MSAA_8X,
+}
+
 var fullscreen: bool = false
 var maximized: bool = false
 var window_position: Vector2i = Vector2i.ZERO
 var window_size: Vector2i = Vector2i.ZERO
 var fpv_controls: bool = false
 var detail_level: DetailLevel = DetailLevel.HIGH
+var antialiasing_level: AntialiasingLevel = AntialiasingLevel.MSAA_8X
 
 
 func load_settings():
@@ -29,6 +37,7 @@ func load_settings():
 	maximized = config.get_value("display", "maximized", false)
 	fpv_controls = config.get_value("controls", "fpv_controls", false)
 	detail_level = _get_valid_detail_level(config.get_value("display", "detail_level", DetailLevel.HIGH))
+	antialiasing_level = _get_valid_antialiasing_level(config.get_value("display", "antialiasing_level", AntialiasingLevel.MSAA_8X))
 	window_position = Vector2i(
 		config.get_value("display", "window_x", 0),
 		config.get_value("display", "window_y", 0)
@@ -48,6 +57,7 @@ func save_settings():
 	config.set_value("display", "window_width", window_size.x)
 	config.set_value("display", "window_height", window_size.y)
 	config.set_value("display", "detail_level", detail_level)
+	config.set_value("display", "antialiasing_level", antialiasing_level)
 	config.set_value("controls", "fpv_controls", fpv_controls)
 
 	var err = config.save(SETTINGS_FILE)
@@ -84,8 +94,19 @@ func set_detail_level(level: DetailLevel):
 	save_settings()
 
 
+func set_antialiasing_level(level: AntialiasingLevel):
+	level = _get_valid_antialiasing_level(level)
+	if antialiasing_level == level:
+		return
+
+	antialiasing_level = level
+	_apply_antialiasing_level()
+	save_settings()
+
+
 func apply_startup_settings():
 	_apply_window_mode()
+	_apply_antialiasing_level()
 
 	if not fullscreen and not maximized:
 		_restore_window_bounds()
@@ -242,6 +263,12 @@ func _apply_window_mode():
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 
 
+func _apply_antialiasing_level():
+	var viewport := Engine.get_main_loop().root as Window
+	if viewport:
+		viewport.msaa_2d = antialiasing_level as Viewport.MSAA
+
+
 func _get_valid_detail_level(value) -> DetailLevel:
 	if typeof(value) != TYPE_INT:
 		return DetailLevel.HIGH
@@ -251,3 +278,17 @@ func _get_valid_detail_level(value) -> DetailLevel:
 		return DetailLevel.HIGH
 
 	return level as DetailLevel
+
+
+func _get_valid_antialiasing_level(value) -> AntialiasingLevel:
+	if typeof(value) != TYPE_INT:
+		return AntialiasingLevel.MSAA_8X
+
+	var level := int(value)
+	if level != AntialiasingLevel.OFF \
+			and level != AntialiasingLevel.MSAA_2X \
+			and level != AntialiasingLevel.MSAA_4X \
+			and level != AntialiasingLevel.MSAA_8X:
+		return AntialiasingLevel.MSAA_8X
+
+	return level as AntialiasingLevel
