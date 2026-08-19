@@ -24,6 +24,7 @@ const JOINT_BIG_SEGMENT_BONUS: float = 6.0  # Extra length for big segments
 # Components that will be spawned.
 const body_scene  := preload("res://components/snake_body.tscn") as PackedScene
 const joint_scene := preload("res://components/snake_joint.tscn") as PackedScene
+const score_popup_scene := preload("res://components/score_popup.tscn") as PackedScene
 
 # Snake controller for trail-following behavior
 var controller: SnakeController = null
@@ -349,6 +350,7 @@ func _on_body_entered( body: Node ):
 		var bonus_score = ceili( time_bonus ) * base_score
 		var awarded_points = base_score + bonus_score
 
+		_spawn_score_popup( awarded_points )
 		_play_eat_sound( awarded_points )
 
 		# Trigger food's collection effect before removing it
@@ -373,6 +375,31 @@ func _play_eat_sound(awarded_points: int):
 	var award_intensity := clampf(float(awarded_points) / MAX_FOOD_AWARD_POINTS, 0.0, 1.0)
 	$EatSound.volume_db = lerpf(EAT_SOUND_MIN_VOLUME_DB, EAT_SOUND_MAX_VOLUME_DB, award_intensity)
 	$EatSound.play()
+
+
+func _spawn_score_popup(awarded_points: int):
+
+	var popup := score_popup_scene.instantiate() as ScorePopup
+	var parent := get_tree().current_scene
+	if parent == null:
+		parent = get_parent()
+
+	parent.add_child(popup)
+	popup.show_score(awarded_points, global_position, _get_score_popup_direction())
+
+
+func _get_score_popup_direction() -> Vector2:
+
+	if linear_velocity.length() >= MIN_EFFECTIVE_DIRECTION_SPEED:
+		return linear_velocity.normalized()
+
+	if last_effective_direction != Vector2.ZERO:
+		return last_effective_direction
+
+	if current_direction != Vector2.ZERO:
+		return current_direction.normalized()
+
+	return Vector2.RIGHT
 
 
 func _buffer_food( food_size: Food.FoodSize, food_nutrition: int = 1 ):

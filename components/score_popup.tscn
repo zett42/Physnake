@@ -1,0 +1,24 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://components/score_popup.gd" id="1_40n7e"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_1sirw"]
+font_size = 22
+font_color = Color(0.92, 1, 0.78, 1)
+outline_size = 5
+outline_color = Color(0.04, 0.055, 0.035, 0.82)
+
+[node name="ScorePopup" type="Node2D"]
+z_index = 20
+script = ExtResource("1_40n7e")
+
+[node name="Label" type="Label" parent="."]
+offset_left = -60.0
+offset_top = -17.0
+offset_right = 60.0
+offset_bottom = 17.0
+mouse_filter = 2
+text = "+1"
+label_settings = SubResource("LabelSettings_1sirw")
+horizontal_alignment = 1
+vertical_alignment = 1
