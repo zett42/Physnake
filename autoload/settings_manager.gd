@@ -28,6 +28,7 @@ var maximized: bool = false
 var window_position: Vector2i = Vector2i.ZERO
 var window_size: Vector2i = Vector2i.ZERO
 var vsync: bool = true
+var show_fps: bool = false
 var fpv_controls: bool = false
 var detail_level: DetailLevel = DetailLevel.HIGH
 var antialiasing_level: AntialiasingLevel = AntialiasingLevel.MSAA_8X
@@ -44,6 +45,7 @@ func load_settings():
 	fullscreen = config.get_value("display", "fullscreen", false)
 	maximized = config.get_value("display", "maximized", false)
 	vsync = config.get_value("display", "vsync", true)
+	show_fps = config.get_value("display", "show_fps", false)
 	fpv_controls = config.get_value("controls", "fpv_controls", false)
 	detail_level = _get_valid_detail_level(config.get_value("display", "detail_level", DetailLevel.HIGH))
 	antialiasing_level = _get_valid_antialiasing_level(config.get_value("display", "antialiasing_level", AntialiasingLevel.MSAA_8X))
@@ -63,6 +65,7 @@ func save_settings():
 	config.set_value("display", "fullscreen", fullscreen)
 	config.set_value("display", "maximized", maximized)
 	config.set_value("display", "vsync", vsync)
+	config.set_value("display", "show_fps", show_fps)
 	config.set_value("display", "window_x", window_position.x)
 	config.set_value("display", "window_y", window_position.y)
 	config.set_value("display", "window_width", window_size.x)
@@ -95,6 +98,14 @@ func set_vsync(enabled: bool):
 
 	vsync = enabled
 	_apply_vsync()
+	save_settings()
+
+
+func set_show_fps(enabled: bool):
+	if show_fps == enabled:
+		return
+
+	show_fps = enabled
 	save_settings()
 
 

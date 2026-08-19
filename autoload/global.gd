@@ -117,6 +117,14 @@ func set_vsync(enabled: bool):
 	settings.set_vsync(enabled)
 
 
+func is_show_fps_enabled() -> bool:
+	return settings.show_fps
+
+
+func set_show_fps(enabled: bool):
+	settings.set_show_fps(enabled)
+
+
 func is_fpv_controls_enabled() -> bool:
 	return settings.fpv_controls
 

@@ -1,8 +1,9 @@
-[gd_scene load_steps=10 format=3 uid="uid://dhd4r7ulkmuy1"]
+[gd_scene load_steps=11 format=3 uid="uid://dhd4r7ulkmuy1"]
 
 [ext_resource type="Script" uid="uid://d2s7g03tgreop" path="res://ui/room.gd" id="1_j8lbu"]
 [ext_resource type="PackedScene" uid="uid://df45hl5y4bimn" path="res://components/food_spawner.tscn" id="2_854ml"]
 [ext_resource type="PackedScene" uid="uid://b5qvw8yxn3cq6" path="res://ui/pause_menu.tscn" id="3_pause"]
+[ext_resource type="Script" path="res://ui/fps_display.gd" id="4_fps"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_43je0"]
 friction = 0.0
@@ -111,6 +112,18 @@ offset_left = 144.0
 offset_right = 270.0
 offset_bottom = 26.0
 text = "Time Bonus:"
+
+[node name="FpsDisplay" type="Label" parent="ScorePanel"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -95.0
+offset_top = 0.0
+offset_right = -24.0
+offset_bottom = 23.0
+grow_horizontal = 0
+horizontal_alignment = 2
+script = ExtResource("4_fps")
 
 [node name="PauseMenu" parent="." instance=ExtResource("3_pause")]
 

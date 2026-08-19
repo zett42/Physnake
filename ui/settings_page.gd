@@ -5,6 +5,7 @@ func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	$FullscreenCheckButton.button_pressed = Global.is_fullscreen_enabled()
 	$VSyncCheckButton.button_pressed = Global.is_vsync_enabled()
+	$ShowFpsCheckButton.button_pressed = Global.is_show_fps_enabled()
 	$FpvControlsCheckButton.button_pressed = Global.is_fpv_controls_enabled()
 	$DetailLevelOptionButton.select(_get_detail_level_item_index(Global.get_detail_level()))
 	$AntialiasingOptionButton.select(_get_antialiasing_level_item_index(Global.get_antialiasing_level()))
@@ -17,6 +18,10 @@ func _on_fullscreen_check_button_toggled(toggled_on: bool):
 
 func _on_v_sync_check_button_toggled(toggled_on: bool):
 	Global.set_vsync(toggled_on)
+
+
+func _on_show_fps_check_button_toggled(toggled_on: bool):
+	Global.set_show_fps(toggled_on)
 
 
 func _on_fpv_controls_check_button_toggled(toggled_on: bool):
