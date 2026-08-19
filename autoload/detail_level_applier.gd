@@ -10,6 +10,7 @@
 ## - Regenerate visible geometry when the property changes.
 ## - Keep the setting visual-only; collision or gameplay behavior must not change.
 ## - Snake joints may expose "show_detail_line"; it is disabled only on low detail.
+## - Food nodes may expose "show_detail_rings"; it is disabled only on low detail.
 
 class_name DetailLevelApplier
 extends Node
@@ -82,6 +83,9 @@ func _apply_to_node(node: Node):
 	if _has_show_detail_line(node):
 		node.set("show_detail_line", _current_level != SettingsManager.DetailLevel.LOW)
 
+	if _has_show_detail_rings(node):
+		node.set("show_detail_rings", _current_level != SettingsManager.DetailLevel.LOW)
+
 
 ## Returns true when a node exposes the shared polygon detail API.
 func _has_polygon_detail_scale(node: Node) -> bool:
@@ -97,6 +101,15 @@ func _has_show_detail_line(node: Node) -> bool:
 
 	for property in node.get_property_list():
 		if property["name"] == "show_detail_line":
+			return true
+
+	return false
+
+
+func _has_show_detail_rings(node: Node) -> bool:
+
+	for property in node.get_property_list():
+		if property["name"] == "show_detail_rings":
 			return true
 
 	return false

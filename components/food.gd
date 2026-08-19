@@ -13,6 +13,16 @@ const MIN_RING_SEGMENTS := 12
 @export var food_size: FoodSize = FoodSize.NORMAL
 @export var food_nutrition: int = 1
 
+var show_detail_rings := true:
+	set(value):
+		if show_detail_rings == value:
+			return
+
+		show_detail_rings = value
+		_update_tail_count_ring_visibility()
+
+var _tail_count_rings: Array[Node2D] = []
+
 
 func _ready():
 	
@@ -51,8 +61,18 @@ func _setup_tail_count_rings(parent_node: Node2D, base_radius: float):
 		ring.enable_fill = false
 		ring.border_color = Color(0, 0, 0, 0.5)  # Semi-transparent black
 		parent_node.add_child(ring)
+		_tail_count_rings.append(ring)
 		# Must call update after adding to tree to generate the polygons
 		ring.update_polygon_nodes()
+
+	_update_tail_count_ring_visibility()
+
+
+func _update_tail_count_ring_visibility():
+
+	for ring in _tail_count_rings:
+		if is_instance_valid(ring):
+			ring.visible = show_detail_rings
 
 
 func play_collection_effect():
