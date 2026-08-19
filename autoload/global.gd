@@ -1,8 +1,5 @@
 extends Node
 
-
-const SettingsManager = preload("res://autoload/settings_manager.gd")
-
 signal detail_level_changed(level: SettingsManager.DetailLevel)
 
 @export var time_bonus: int = 0:

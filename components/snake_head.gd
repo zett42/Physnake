@@ -65,6 +65,7 @@ const MIN_PARALLEL_COMPONENT_LENGTH_SQ: float = 0.001  # Minimum parallel compon
 const INPUT_DIRECTION_THRESHOLD: float = 0.05  # Minimum input to detect directional intent
 const MIN_EFFECTIVE_DIRECTION_SPEED: float = 10.0  # Minimum speed used to derive FPV direction from velocity
 const EIGHT_WAY_AXIS_DOMINANCE: float = 2.41421356237  # tan(67.5 degrees), for nearest 45-degree snap
+const MIN_VISUAL_DIRECTION_LENGTH_SQUARED := 1.0
 
 var wall_raycast_up: RayCast2D
 var wall_raycast_down: RayCast2D
@@ -121,6 +122,14 @@ func _process( delta ):
 	
 	# Check if we should spawn buffered segments based on tail movement
 	_check_tail_spawning()
+
+
+func set_visual_direction(direction: Vector2):
+
+	if direction.length_squared() < MIN_VISUAL_DIRECTION_LENGTH_SQUARED:
+		return
+
+	$VisibleShape.rotation = direction.angle()
 
 
 func _integrate_forces( state: PhysicsDirectBodyState2D ):

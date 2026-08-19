@@ -6,6 +6,8 @@ enum BodySize {
 	BIG,
 }
 
+const MIN_VISUAL_DIRECTION_LENGTH_SQUARED := 1.0
+
 @export var body_size: BodySize = BodySize.NORMAL:
 	set( value ):
 		if body_size != value:
@@ -41,3 +43,13 @@ func _update_body_size():
 			$CollisionShape_normal.disabled = true
 			$CollisionShape_big.disabled = false
 			mass = 0.025
+
+
+func set_visual_direction(direction: Vector2):
+
+	if direction.length_squared() < MIN_VISUAL_DIRECTION_LENGTH_SQUARED:
+		return
+
+	var visual_rotation := direction.angle()
+	$VisibleShape_normal.rotation = visual_rotation
+	$VisibleShape_big.rotation = visual_rotation
