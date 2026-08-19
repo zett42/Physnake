@@ -109,6 +109,14 @@ func set_fullscreen(enabled: bool):
 	settings.set_fullscreen(enabled)
 
 
+func is_vsync_enabled() -> bool:
+	return settings.vsync
+
+
+func set_vsync(enabled: bool):
+	settings.set_vsync(enabled)
+
+
 func is_fpv_controls_enabled() -> bool:
 	return settings.fpv_controls
 
@@ -134,6 +142,14 @@ func get_antialiasing_level() -> SettingsManager.AntialiasingLevel:
 
 func set_antialiasing_level(level: SettingsManager.AntialiasingLevel):
 	settings.set_antialiasing_level(level)
+
+
+func get_physics_framerate() -> SettingsManager.PhysicsFramerate:
+	return settings.physics_framerate
+
+
+func set_physics_framerate(framerate: SettingsManager.PhysicsFramerate):
+	settings.set_physics_framerate(framerate)
 
 
 func _save_window_bounds():
