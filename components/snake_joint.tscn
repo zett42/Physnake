@@ -17,4 +17,3 @@ z_index = -1
 points = PackedVector2Array(0, 0, 0, 0)
 width = 14.0
 default_color = Color(1, 0.815686, 0, 1)
-antialiased = true

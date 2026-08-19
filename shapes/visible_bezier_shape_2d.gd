@@ -189,7 +189,6 @@ func _ensure_polygon_node( p_name: String, p_color: Color ) -> Polygon2D:
 	node = Polygon2D.new()
 	node.name = p_name
 	node.color = p_color
-	node.antialiased = true
 
 	add_child( node, true, Node.INTERNAL_MODE_FRONT )
 
@@ -238,7 +237,6 @@ func _ensure_line_node( p_name: String, p_color: Color ) -> Line2D:
 	node = Line2D.new()
 	node.name = p_name
 	node.default_color = p_color
-	node.antialiased = true
 	node.z_index = 1   # to draw line over fill polygon, regardless of node ordering
 
 	add_child( node, true, Node.INTERNAL_MODE_FRONT )

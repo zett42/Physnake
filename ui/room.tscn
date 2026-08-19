@@ -28,7 +28,6 @@ points = PackedVector2Array(22.0, 23.5, 1128.5, 23.5, 1128.5, 624.5, 23.5, 624.5
 closed = true
 width = 3.0
 default_color = Color(0.65, 0.65, 0.65, 1.0)
-antialiased = false
 
 [node name="WallTop" type="StaticBody2D" parent="." groups=["deadly_wall"]]
 collision_layer = 1

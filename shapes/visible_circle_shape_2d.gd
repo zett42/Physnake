@@ -212,7 +212,6 @@ func _ensure_polygon_node( p_node: Polygon2D, p_name: String, p_color: Color ) -
 	var node := Polygon2D.new()
 	node.name = p_name
 	node.color = p_color
-	node.antialiased = true
 
 	add_child( node, true, Node.INTERNAL_MODE_FRONT )
 
