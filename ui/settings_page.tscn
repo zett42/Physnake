@@ -58,22 +58,46 @@ theme_override_colors/font_color = Color(0.701961, 0.701961, 0.701961, 1)
 theme_override_font_sizes/font_size = 20
 text = "FPV Controls"
 
-[node name="VSyncCheckButton" type="CheckButton" parent="."]
+[node name="VSyncLabel" type="Label" parent="."]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -111.0
+offset_left = -166.0
 offset_top = -98.0
-offset_right = 111.0
+offset_right = -22.0
 offset_bottom = -58.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0.701961, 0.701961, 0.701961, 1)
 theme_override_font_sizes/font_size = 20
 text = "VSync"
+vertical_alignment = 1
+
+[node name="VSyncOptionButton" type="OptionButton" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -14.0
+offset_top = -100.0
+offset_right = 166.0
+offset_bottom = -60.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 20
+item_count = 3
+selected = 1
+popup/item_0/text = "Off"
+popup/item_0/id = 0
+popup/item_1/text = "On"
+popup/item_1/id = 1
+popup/item_2/text = "Adaptive"
+popup/item_2/id = 2
 
 [node name="ShowFpsCheckButton" type="CheckButton" parent="."]
 layout_mode = 1
@@ -234,9 +258,9 @@ theme_override_font_sizes/font_size = 20
 text = "Back"
 
 [connection signal="toggled" from="FullscreenCheckButton" to="." method="_on_fullscreen_check_button_toggled"]
-[connection signal="toggled" from="VSyncCheckButton" to="." method="_on_v_sync_check_button_toggled"]
 [connection signal="toggled" from="ShowFpsCheckButton" to="." method="_on_show_fps_check_button_toggled"]
 [connection signal="toggled" from="FpvControlsCheckButton" to="." method="_on_fpv_controls_check_button_toggled"]
+[connection signal="item_selected" from="VSyncOptionButton" to="." method="_on_v_sync_option_button_item_selected"]
 [connection signal="item_selected" from="DetailLevelOptionButton" to="." method="_on_detail_level_option_button_item_selected"]
 [connection signal="item_selected" from="AntialiasingOptionButton" to="." method="_on_antialiasing_option_button_item_selected"]
 [connection signal="item_selected" from="PhysicsFramerateOptionButton" to="." method="_on_physics_framerate_option_button_item_selected"]

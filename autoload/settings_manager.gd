@@ -23,11 +23,17 @@ enum PhysicsFramerate {
 	FPS_120 = 120,
 }
 
+enum VSyncMode {
+	DISABLED = DisplayServer.VSYNC_DISABLED,
+	ENABLED = DisplayServer.VSYNC_ENABLED,
+	ADAPTIVE = DisplayServer.VSYNC_ADAPTIVE,
+}
+
 var fullscreen: bool = false
 var maximized: bool = false
 var window_position: Vector2i = Vector2i.ZERO
 var window_size: Vector2i = Vector2i.ZERO
-var vsync: bool = true
+var vsync_mode: VSyncMode = VSyncMode.ENABLED
 var show_fps: bool = false
 var fpv_controls: bool = false
 var detail_level: DetailLevel = DetailLevel.HIGH
@@ -44,7 +50,7 @@ func load_settings():
 
 	fullscreen = config.get_value("display", "fullscreen", false)
 	maximized = config.get_value("display", "maximized", false)
-	vsync = config.get_value("display", "vsync", true)
+	vsync_mode = _get_valid_vsync_mode(config.get_value("display", "vsync_mode", config.get_value("display", "vsync", true)))
 	show_fps = config.get_value("display", "show_fps", false)
 	fpv_controls = config.get_value("controls", "fpv_controls", false)
 	detail_level = _get_valid_detail_level(config.get_value("display", "detail_level", DetailLevel.HIGH))
@@ -64,7 +70,7 @@ func save_settings():
 	var config = ConfigFile.new()
 	config.set_value("display", "fullscreen", fullscreen)
 	config.set_value("display", "maximized", maximized)
-	config.set_value("display", "vsync", vsync)
+	config.set_value("display", "vsync_mode", vsync_mode)
 	config.set_value("display", "show_fps", show_fps)
 	config.set_value("display", "window_x", window_position.x)
 	config.set_value("display", "window_y", window_position.y)
@@ -92,11 +98,12 @@ func set_fullscreen(enabled: bool):
 	save_settings()
 
 
-func set_vsync(enabled: bool):
-	if vsync == enabled:
+func set_vsync_mode(mode: VSyncMode):
+	mode = _get_valid_vsync_mode(mode)
+	if vsync_mode == mode:
 		return
 
-	vsync = enabled
+	vsync_mode = mode
 	_apply_vsync()
 	save_settings()
 
@@ -308,8 +315,7 @@ func _apply_window_mode():
 
 
 func _apply_vsync():
-	var mode := DisplayServer.VSYNC_ENABLED if vsync else DisplayServer.VSYNC_DISABLED
-	DisplayServer.window_set_vsync_mode(mode)
+	DisplayServer.window_set_vsync_mode(vsync_mode as DisplayServer.VSyncMode)
 
 
 func _apply_antialiasing_level():
@@ -345,6 +351,22 @@ func _get_valid_antialiasing_level(value) -> AntialiasingLevel:
 		return AntialiasingLevel.MSAA_8X
 
 	return level as AntialiasingLevel
+
+
+func _get_valid_vsync_mode(value) -> VSyncMode:
+	if typeof(value) == TYPE_BOOL:
+		return VSyncMode.ENABLED if value else VSyncMode.DISABLED
+
+	if typeof(value) != TYPE_INT:
+		return VSyncMode.ENABLED
+
+	var mode := int(value)
+	if mode != VSyncMode.DISABLED \
+			and mode != VSyncMode.ENABLED \
+			and mode != VSyncMode.ADAPTIVE:
+		return VSyncMode.ENABLED
+
+	return mode as VSyncMode
 
 
 func _get_valid_physics_framerate(value) -> PhysicsFramerate:

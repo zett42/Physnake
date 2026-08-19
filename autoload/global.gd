@@ -109,12 +109,12 @@ func set_fullscreen(enabled: bool):
 	settings.set_fullscreen(enabled)
 
 
-func is_vsync_enabled() -> bool:
-	return settings.vsync
+func get_vsync_mode() -> SettingsManager.VSyncMode:
+	return settings.vsync_mode
 
 
-func set_vsync(enabled: bool):
-	settings.set_vsync(enabled)
+func set_vsync_mode(mode: SettingsManager.VSyncMode):
+	settings.set_vsync_mode(mode)
 
 
 func is_show_fps_enabled() -> bool:
