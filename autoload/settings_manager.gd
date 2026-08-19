@@ -4,11 +4,18 @@ extends RefCounted
 
 const SETTINGS_FILE = "user://settings.cfg"
 
+enum DetailLevel {
+	LOW,
+	MEDIUM,
+	HIGH,
+}
+
 var fullscreen: bool = false
 var maximized: bool = false
 var window_position: Vector2i = Vector2i.ZERO
 var window_size: Vector2i = Vector2i.ZERO
 var fpv_controls: bool = false
+var detail_level: DetailLevel = DetailLevel.HIGH
 
 
 func load_settings():
@@ -21,6 +28,7 @@ func load_settings():
 	fullscreen = config.get_value("display", "fullscreen", false)
 	maximized = config.get_value("display", "maximized", false)
 	fpv_controls = config.get_value("controls", "fpv_controls", false)
+	detail_level = _get_valid_detail_level(config.get_value("display", "detail_level", DetailLevel.HIGH))
 	window_position = Vector2i(
 		config.get_value("display", "window_x", 0),
 		config.get_value("display", "window_y", 0)
@@ -39,6 +47,7 @@ func save_settings():
 	config.set_value("display", "window_y", window_position.y)
 	config.set_value("display", "window_width", window_size.x)
 	config.set_value("display", "window_height", window_size.y)
+	config.set_value("display", "detail_level", detail_level)
 	config.set_value("controls", "fpv_controls", fpv_controls)
 
 	var err = config.save(SETTINGS_FILE)
@@ -63,6 +72,15 @@ func set_fpv_controls(enabled: bool):
 		return
 
 	fpv_controls = enabled
+	save_settings()
+
+
+func set_detail_level(level: DetailLevel):
+	level = _get_valid_detail_level(level)
+	if detail_level == level:
+		return
+
+	detail_level = level
 	save_settings()
 
 
@@ -222,3 +240,14 @@ func _apply_window_mode():
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_MAXIMIZED)
 	else:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+
+
+func _get_valid_detail_level(value) -> DetailLevel:
+	if typeof(value) != TYPE_INT:
+		return DetailLevel.HIGH
+
+	var level := int(value)
+	if level < DetailLevel.LOW or level > DetailLevel.HIGH:
+		return DetailLevel.HIGH
+
+	return level as DetailLevel

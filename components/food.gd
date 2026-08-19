@@ -7,6 +7,8 @@ enum FoodSize {
 }
 
 const MAX_NUTRITION: int = 3
+const RING_SEGMENTS_PER_RADIUS := 3.0
+const MIN_RING_SEGMENTS := 12
 
 @export var food_size: FoodSize = FoodSize.NORMAL
 @export var food_nutrition: int = 1
@@ -44,6 +46,7 @@ func _setup_tail_count_rings(parent_node: Node2D, base_radius: float):
 		var ring_radius := base_radius - ring_spacing * (i + 1)
 		var ring := VisibleCircleShape2D.new()
 		ring.radius = ring_radius
+		ring.num_circle_segments = maxi(MIN_RING_SEGMENTS, roundi(ring_radius * RING_SEGMENTS_PER_RADIUS))
 		ring.border_width = ring_width
 		ring.enable_fill = false
 		ring.border_color = Color(0, 0, 0, 0.5)  # Semi-transparent black

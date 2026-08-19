@@ -3,6 +3,8 @@ extends Node
 
 const SettingsManager = preload("res://autoload/settings_manager.gd")
 
+signal detail_level_changed(level: SettingsManager.DetailLevel)
+
 @export var time_bonus: int = 0:
 	get:
 		return time_bonus
@@ -26,12 +28,17 @@ var total_score: int = 0
 var total_bonus: int = 0
 
 var _is_game_over: bool = false
+var _detail_level_applier := DetailLevelApplier.new()
 var settings := SettingsManager.new()
 
 
 func _ready():
+	
 	settings.load_settings()
 	settings.apply_startup_settings()
+	
+	add_child(_detail_level_applier)
+	_detail_level_applier.initialize(self)
 
 
 func _exit_tree():
@@ -111,6 +118,17 @@ func is_fpv_controls_enabled() -> bool:
 
 func set_fpv_controls(enabled: bool):
 	settings.set_fpv_controls(enabled)
+
+
+func get_detail_level() -> SettingsManager.DetailLevel:
+	return settings.detail_level
+
+
+func set_detail_level(level: SettingsManager.DetailLevel):
+	var previous_level := settings.detail_level
+	settings.set_detail_level(level)
+	if settings.detail_level != previous_level:
+		detail_level_changed.emit(settings.detail_level)
 
 
 func _save_window_bounds():

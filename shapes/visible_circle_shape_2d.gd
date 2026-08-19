@@ -8,6 +8,8 @@ extends Node2D
 const OUTER_BORDER_NODE_NAME = "OuterBorder"
 const INNER_BORDER_NODE_NAME = "InnerBorder"
 const FILL_NODE_NAME = "Fill"
+const MIN_POLYGON_DETAIL_SCALE := 0.05
+const MAX_POLYGON_DETAIL_SCALE := 1.0
 
 
 ## When set to false, protects the polygons from changes through properties.
@@ -73,6 +75,15 @@ const FILL_NODE_NAME = "Fill"
 			num_circle_segments = value
 			if is_inside_tree() and Engine.is_editor_hint() and update_polygons:
 				update_polygon_nodes()
+
+## Scale applied to the authored polygon detail. Values below 1.0 reduce point count.
+@export_range(MIN_POLYGON_DETAIL_SCALE, MAX_POLYGON_DETAIL_SCALE, 0.01) var polygon_detail_scale := 1.0:
+	set(value):
+		var clamped_value := clampf(value, MIN_POLYGON_DETAIL_SCALE, MAX_POLYGON_DETAIL_SCALE)
+		if polygon_detail_scale != clamped_value:
+			polygon_detail_scale = clamped_value
+			if is_node_ready() and update_polygons:
+				call_deferred("update_polygon_nodes")
 
 ## Fill inner circle. If false, only border will be drawn.
 @export var enable_fill := true:
@@ -147,7 +158,7 @@ func update_outer_border_polygon_node():
 		_border_polygon_node = _ensure_polygon_node( _border_polygon_node, OUTER_BORDER_NODE_NAME, border_color )
 			
 		_border_polygon_node.polygon = VisibleCircleShape2D.calculate_circle_polygon( 
-				radius - border_width, radius, start_angle, central_angle, num_circle_segments )
+				radius - border_width, radius, start_angle, central_angle, _get_effective_num_circle_segments() )
 
 	elif _border_polygon_node:
 		# The docs include a big warning about using queue_free() in the editor, but it appears
@@ -165,7 +176,7 @@ func update_inner_border_polygon_node():
 			
 		_inner_border_polygon_node.polygon = VisibleCircleShape2D.calculate_circle_polygon( 
 				inner_radius, inner_radius + inner_border_width, start_angle, central_angle, 
-				num_circle_segments )
+				_get_effective_num_circle_segments() )
 
 	elif _inner_border_polygon_node:
 		# The docs include a big warning about using queue_free() in the editor, but it appears
@@ -183,7 +194,7 @@ func update_fill_polygon_node():
 
 		_fill_polygon_node.polygon = VisibleCircleShape2D.calculate_circle_polygon( 
 				inner_radius + inner_border_width, radius - border_width, start_angle, 
-				central_angle, num_circle_segments )
+				central_angle, _get_effective_num_circle_segments() )
 
 	elif _fill_polygon_node:
 		# The docs include a big warning about using queue_free() in the editor, but it appears
@@ -271,3 +282,8 @@ func _update_polygon_color():
 		_inner_border_polygon_node.color = inner_border_color
 	if _fill_polygon_node:
 		_fill_polygon_node.color = color
+
+
+func _get_effective_num_circle_segments() -> int:
+	
+	return maxi(6, roundi(num_circle_segments * polygon_detail_scale))

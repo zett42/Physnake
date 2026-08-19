@@ -22,6 +22,9 @@ func _ready():
 	# Enable Continuous Collision Detection for fast-moving segments
 	continuous_cd = RigidBody2D.CCD_MODE_CAST_RAY
 
+	# Low detail modes make circular segments visibly faceted, so keep them from spinning.
+	lock_rotation = true
+
 
 func _update_body_size():
 

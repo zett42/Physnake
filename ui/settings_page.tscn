@@ -32,9 +32,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -111.0
-offset_top = -20.0
+offset_top = -68.0
 offset_right = 111.0
-offset_bottom = 20.0
+offset_bottom = -28.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0.701961, 0.701961, 0.701961, 1)
@@ -49,14 +49,55 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -111.0
-offset_top = 36.0
+offset_top = -12.0
 offset_right = 111.0
-offset_bottom = 76.0
+offset_bottom = 28.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_colors/font_color = Color(0.701961, 0.701961, 0.701961, 1)
 theme_override_font_sizes/font_size = 20
 text = "FPV Controls"
+
+[node name="DetailLevelLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -166.0
+offset_top = 52.0
+offset_right = -22.0
+offset_bottom = 86.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.701961, 0.701961, 0.701961, 1)
+theme_override_font_sizes/font_size = 20
+text = "Detail Level"
+vertical_alignment = 1
+
+[node name="DetailLevelOptionButton" type="OptionButton" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -14.0
+offset_top = 50.0
+offset_right = 166.0
+offset_bottom = 90.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 20
+item_count = 3
+selected = 0
+popup/item_0/text = "High"
+popup/item_0/id = 2
+popup/item_1/text = "Medium"
+popup/item_1/id = 1
+popup/item_2/text = "Low"
+popup/item_2/id = 0
 
 [node name="BackButton" type="Button" parent="."]
 layout_mode = 1
@@ -76,4 +117,5 @@ text = "Back"
 
 [connection signal="toggled" from="FullscreenCheckButton" to="." method="_on_fullscreen_check_button_toggled"]
 [connection signal="toggled" from="FpvControlsCheckButton" to="." method="_on_fpv_controls_check_button_toggled"]
+[connection signal="item_selected" from="DetailLevelOptionButton" to="." method="_on_detail_level_option_button_item_selected"]
 [connection signal="pressed" from="BackButton" to="." method="_on_back_button_pressed"]

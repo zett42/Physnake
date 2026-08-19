@@ -5,6 +5,9 @@ extends Path2D
 
 const FILL_NODE_NAME = "Fill"
 const OUTLINE_NODE_NAME = "Outline"
+const MIN_POLYGON_DETAIL_SCALE := 0.05
+const MAX_POLYGON_DETAIL_SCALE := 1.0
+const POLYGON_DETAIL_FALLBACK_SCALES := [0.5, 0.75, 1.0]
 
 
 ## When set to false, protects the polygons from changes through properties.
@@ -38,6 +41,15 @@ const OUTLINE_NODE_NAME = "Outline"
 			close_outline = value
 			if Engine.is_editor_hint() and is_inside_tree() and update_polygons:
 				update_outline_node()
+
+## Scale applied to the authored polygon detail. Values below 1.0 reduce point count.
+@export_range(MIN_POLYGON_DETAIL_SCALE, MAX_POLYGON_DETAIL_SCALE, 0.01) var polygon_detail_scale := 1.0:
+	set(value):
+		var clamped_value := clampf(value, MIN_POLYGON_DETAIL_SCALE, MAX_POLYGON_DETAIL_SCALE)
+		if polygon_detail_scale != clamped_value:
+			polygon_detail_scale = clamped_value
+			if is_node_ready() and update_polygons:
+				call_deferred("update_child_nodes")
 				
 ## Outline width.
 @export_range(0, 50, 0.5, "or_greater") var outline_width := 1.0:
@@ -136,9 +148,9 @@ func update_fill_polygon_node():
 		_fill_polygon_node = _ensure_polygon_node( FILL_NODE_NAME, color )
 
 		if curve:
-			_fill_polygon_node.polygon = curve.get_baked_points()
+			_fill_polygon_node.polygon = _get_effective_baked_points()
 		else:
-			_fill_polygon_node.polygon.clear()
+			_fill_polygon_node.polygon = PackedVector2Array()
 
 	elif _fill_polygon_node:
 		# The docs include a big warning about using queue_free() in the editor, but it appears
@@ -154,7 +166,7 @@ func update_outline_node():
 		
 		if curve:
 			_outline_node.width = outline_width
-			_outline_node.points = curve.get_baked_points()
+			_outline_node.points = _get_effective_baked_points()
 			if close_outline:
 				_outline_node.add_point( _outline_node.get_point_position( 0 ) )
 		else:
@@ -187,6 +199,33 @@ func _ensure_polygon_node( p_name: String, p_color: Color ) -> Polygon2D:
 		node.owner = get_tree().edited_scene_root
 
 	return node
+
+
+func _get_effective_baked_points() -> PackedVector2Array:
+
+	if is_equal_approx(polygon_detail_scale, 1.0):
+		return curve.get_baked_points()
+
+	var baked_points := _get_baked_points_for_detail_scale(polygon_detail_scale)
+	if Geometry2D.triangulate_polygon(baked_points).size() > 0:
+		return baked_points
+
+	for fallback_scale in POLYGON_DETAIL_FALLBACK_SCALES:
+		if fallback_scale <= polygon_detail_scale:
+			continue
+
+		baked_points = _get_baked_points_for_detail_scale(fallback_scale)
+		if Geometry2D.triangulate_polygon(baked_points).size() > 0:
+			return baked_points
+
+	return curve.get_baked_points()
+
+
+func _get_baked_points_for_detail_scale(detail_scale: float) -> PackedVector2Array:
+	
+	var detail_curve := curve.duplicate() as Curve2D
+	detail_curve.bake_interval = curve.bake_interval / detail_scale
+	return detail_curve.get_baked_points()
 
 
 # Create line node if not exists.
