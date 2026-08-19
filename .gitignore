@@ -1,4 +1,4 @@
 # Godot 4+ specific ignores
 .godot/
-/export
+_export/
 .vscode/settings.json
