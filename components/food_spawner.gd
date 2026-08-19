@@ -4,7 +4,7 @@ const food_scene = preload("res://components/food.tscn")
 
 # Propability that big food is spawned (0..1)
 const BIG_FOOD_PROPABILITY: float = 0.1
-const GOLDEN_FOOD_PROBABILITY: float = 0.05
+const GOLDEN_FOOD_PROBABILITY: float = 0.075
 
 
 @export var food_count: int = 25
