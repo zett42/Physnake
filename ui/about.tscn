@@ -46,7 +46,7 @@ offset_top = 80.0
 offset_bottom = 120.0
 grow_horizontal = 2
 theme_override_font_sizes/font_size = 24
-text = "Version 0.4.0"
+text = "Version 0.4.1"
 horizontal_alignment = 1
 
 [node name="DescriptionLabel" type="Label" parent="Panel"]

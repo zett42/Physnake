@@ -2,6 +2,8 @@ extends Window
 
 
 func _ready():
+	$Panel/VersionLabel.text = "Version %s" % ProjectSettings.get_setting("application/config/version", "unknown")
+
 	# Load and display the LICENSE file
 	var license_path = "res://LICENSE"
 	if FileAccess.file_exists(license_path):
