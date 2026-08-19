@@ -9,6 +9,9 @@ enum FoodSize {
 const MAX_NUTRITION: int = 3
 const RING_SEGMENTS_PER_RADIUS := 3.0
 const MIN_RING_SEGMENTS := 12
+const MAX_COLLECTION_EFFECT_POINTS := 36.0
+const LOW_VALUE_PARTICLE_COLOR := Color(0.235294, 1.0, 0.0, 1.0)
+const HIGH_VALUE_PARTICLE_COLOR := Color(0.45, 1.0, 0.87, 1.0)
 
 @export var food_size: FoodSize = FoodSize.NORMAL
 @export var food_nutrition: int = 1
@@ -75,23 +78,30 @@ func _update_tail_count_ring_visibility():
 			ring.visible = show_detail_rings
 
 
-func play_collection_effect():
+func play_collection_effect(awarded_points: int):
 	"""Play particle effect when food is collected. Should be called before queue_free()."""
 
 	# Scale particle effect based on food size and nutrition
 	var size_multiplier = 1.5 if food_size == FoodSize.BIG else 1.0
 	var nutrition_multiplier = 1.0 + (food_nutrition - 1) * 0.3  # +30% per extra nutrition
 	var total_multiplier = size_multiplier * nutrition_multiplier
+	var award_intensity := clampf(float(awarded_points) / MAX_COLLECTION_EFFECT_POINTS, 0.0, 1.0)
 
 	var particles := $CollectionParticles
-	particles.amount = int(60 * total_multiplier)
-	particles.scale = Vector2.ONE * (0.8 + (total_multiplier - 1.0) * 0.4)  # Slightly bigger visual size
+	particles.amount = int(60 * total_multiplier * lerpf(1.0, 2.4, award_intensity))
+	particles.scale = Vector2.ONE * (0.8 + (total_multiplier - 1.0) * 0.4 + award_intensity * 0.35)
+	particles.modulate = LOW_VALUE_PARTICLE_COLOR.lerp(HIGH_VALUE_PARTICLE_COLOR, award_intensity)
+
+	if particles.process_material is ParticleProcessMaterial:
+		var mat := (particles.process_material as ParticleProcessMaterial).duplicate() as ParticleProcessMaterial
+		mat.initial_velocity_min = lerpf(60.0, 100.0, award_intensity)
+		mat.initial_velocity_max = lerpf(150.0, 300.0, award_intensity)
+		particles.process_material = mat
 
 	# Detach particles from food and reparent to scene root so they persist after food is freed
 	remove_child(particles)
 	get_tree().current_scene.add_child(particles)
 	particles.global_position = global_position
-	particles.modulate = modulate  # Transfer food color to particles
 	particles.emitting = true
 
 	# Auto-cleanup after particles finish

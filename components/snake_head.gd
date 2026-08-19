@@ -12,6 +12,9 @@ const DEADLY_WALL_IMPACT_THRESHOLD: float = 115.0  # Minimum velocity for deadly
 # Time bonus constants
 const MAX_TIME_BONUS: float = 5
 const TIME_BONUS_DURATION: float = 3.0
+const MAX_FOOD_AWARD_POINTS := 36.0
+const EAT_SOUND_MIN_VOLUME_DB := -5.0
+const EAT_SOUND_MAX_VOLUME_DB := 5.0
 
 # Joint length constants
 const JOINT_BASE_REST_LENGTH: float = 25.0  # Base rest length from joint scene
@@ -338,11 +341,17 @@ func _on_body_entered( body: Node ):
 				return
 	
 	if body.is_in_group("food"):
-		
-		$EatSound.play()
+
+		# Calculate score before triggering the effect so particles can reflect the awarded value.
+		var food_size_multiplier = 2.0 if body.food_size == Food.FoodSize.BIG else 1.0
+		var base_score = int(body.food_nutrition * food_size_multiplier)
+		var bonus_score = ceili( time_bonus ) * base_score
+		var awarded_points = base_score + bonus_score
+
+		_play_eat_sound( awarded_points )
 
 		# Trigger food's collection effect before removing it
-		body.play_collection_effect()
+		body.play_collection_effect( awarded_points )
 
 		# Buffer the food for later spawning of snake segment
 		call_deferred( "_buffer_food", body.food_size, body.food_nutrition )
@@ -351,13 +360,18 @@ func _on_body_entered( body: Node ):
 		body.queue_free()
 		
 		# update score
-		var food_size_multiplier = 2.0 if body.food_size == Food.FoodSize.BIG else 1.0
-		var base_score = int(body.food_nutrition * food_size_multiplier)
 		Global.add_score( base_score )
-		Global.add_bonus( ceili( time_bonus ) * base_score )
+		Global.add_bonus( bonus_score )
 		
 		time_bonus = MAX_TIME_BONUS
 		time_bonus_indicator.set_bonus_segments(controller.segments, time_bonus)
+
+
+func _play_eat_sound(awarded_points: int):
+
+	var award_intensity := clampf(float(awarded_points) / MAX_FOOD_AWARD_POINTS, 0.0, 1.0)
+	$EatSound.volume_db = lerpf(EAT_SOUND_MIN_VOLUME_DB, EAT_SOUND_MAX_VOLUME_DB, award_intensity)
+	$EatSound.play()
 
 
 func _buffer_food( food_size: Food.FoodSize, food_nutrition: int = 1 ):
