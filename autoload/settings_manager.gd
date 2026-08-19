@@ -8,6 +8,7 @@ var fullscreen: bool = false
 var maximized: bool = false
 var window_position: Vector2i = Vector2i.ZERO
 var window_size: Vector2i = Vector2i.ZERO
+var fpv_controls: bool = false
 
 
 func load_settings():
@@ -19,6 +20,7 @@ func load_settings():
 
 	fullscreen = config.get_value("display", "fullscreen", false)
 	maximized = config.get_value("display", "maximized", false)
+	fpv_controls = config.get_value("controls", "fpv_controls", false)
 	window_position = Vector2i(
 		config.get_value("display", "window_x", 0),
 		config.get_value("display", "window_y", 0)
@@ -37,6 +39,7 @@ func save_settings():
 	config.set_value("display", "window_y", window_position.y)
 	config.set_value("display", "window_width", window_size.x)
 	config.set_value("display", "window_height", window_size.y)
+	config.set_value("controls", "fpv_controls", fpv_controls)
 
 	var err = config.save(SETTINGS_FILE)
 	if err != OK:
@@ -52,6 +55,14 @@ func set_fullscreen(enabled: bool):
 		maximized = false
 
 	_apply_window_mode()
+	save_settings()
+
+
+func set_fpv_controls(enabled: bool):
+	if fpv_controls == enabled:
+		return
+
+	fpv_controls = enabled
 	save_settings()
 
 

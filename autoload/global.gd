@@ -21,8 +21,6 @@ enum Difficulty {
 }
 
 @export var difficulty = Difficulty.NORMAL
-var auto_move: bool = true  # True for automatic movement (normal/hard), false for manual (easy)
-
 
 var total_score: int = 0
 var total_bonus: int = 0
@@ -105,6 +103,14 @@ func is_fullscreen_enabled() -> bool:
 
 func set_fullscreen(enabled: bool):
 	settings.set_fullscreen(enabled)
+
+
+func is_fpv_controls_enabled() -> bool:
+	return settings.fpv_controls
+
+
+func set_fpv_controls(enabled: bool):
+	settings.set_fpv_controls(enabled)
 
 
 func _save_window_bounds():

@@ -34,8 +34,9 @@ var current_speed: float = SNAKE_MIN_SPEED
 ## Initial movement direction of the snake (used in automatic movement).
 @export var start_direction: Vector2 = Vector2.RIGHT
 
-# Current direction for automatic movement mode (absolute directions)
+# Current direction for automatic movement
 @onready var current_direction: Vector2 = start_direction.normalized() if start_direction != Vector2.ZERO else Vector2.RIGHT
+var last_effective_direction: Vector2 = Vector2.ZERO
 
 # Boost mechanic for automatic movement
 var boost_hold_time: float = 0.0  # Time keys matching direction have been held
@@ -62,6 +63,9 @@ const WALL_SLIDING_DISTANCE_BUFFER: float = 2.0  # Extra distance beyond head ra
 const WALL_SLIDING_VELOCITY_THRESHOLD: float = 150.0  # Max velocity toward wall to trigger parallel sliding
 const MIN_PARALLEL_COMPONENT_LENGTH_SQ: float = 0.001  # Minimum parallel component magnitude squared
 const INPUT_DIRECTION_THRESHOLD: float = 0.05  # Minimum input to detect directional intent
+const MIN_EFFECTIVE_DIRECTION_SPEED: float = 10.0  # Minimum speed used to derive FPV direction from velocity
+const EIGHT_WAY_AXIS_DOMINANCE: float = 2.41421356237  # tan(67.5 degrees), for nearest 45-degree snap
+
 var wall_raycast_up: RayCast2D
 var wall_raycast_down: RayCast2D
 var wall_raycast_left: RayCast2D
@@ -136,24 +140,19 @@ func _integrate_forces( state: PhysicsDirectBodyState2D ):
 		# Use the first contact's normal (or could iterate to find strongest)
 		last_contact_normal = state.get_contact_local_normal(0)
 
-	if Global.auto_move:
-		# Automatic movement mode
-		_handle_automatic_movement(state.step)
-	else:
-		# Manual movement mode
-		_handle_manual_movement()
+	_handle_automatic_movement(state.step)
 
 
 func _handle_automatic_movement(delta: float):
-	"""Handle automatic forward movement with absolute directional input."""
+	"""Handle automatic forward movement."""
 	
-	# Check for direction changes (absolute directions, not relative to snake)
 	# Only change direction when a key is newly pressed, but sample all held keys for diagonals
 	var direction_changed := false
-	var new_direction := Vector2.ZERO
 	
 	# Detect vertical input
-	if Input.is_action_just_pressed("move_up") or Input.is_action_just_pressed("move_down"):
+	if Input.is_action_just_pressed("move_up"):
+		direction_changed = true
+	elif not Global.is_fpv_controls_enabled() and Input.is_action_just_pressed("move_down"):
 		direction_changed = true
 	
 	# Detect horizontal input  
@@ -162,19 +161,10 @@ func _handle_automatic_movement(delta: float):
 	
 	# When a direction key is pressed, sample all currently held keys
 	if direction_changed:
-		if Input.is_action_pressed("move_up"):
-			new_direction.y = -1.0
-		elif Input.is_action_pressed("move_down"):
-			new_direction.y = 1.0
-		
-		if Input.is_action_pressed("move_left"):
-			new_direction.x = -1.0
-		elif Input.is_action_pressed("move_right"):
-			new_direction.x = 1.0
+		var new_direction := _get_input_direction()
 		
 		# Only change direction if it's not opposite to current direction
 		if new_direction != Vector2.ZERO:
-			new_direction = new_direction.normalized()
 			# Prevent turning 180 degrees (opposite direction)
 			if new_direction.dot(current_direction) > -0.9:  # Not opposite (allowing some tolerance)
 				# Adjust direction if near wall to prevent slowdown exploit
@@ -184,23 +174,13 @@ func _handle_automatic_movement(delta: float):
 				boost_hold_time = 0.0
 	
 	# Check if player is holding keys matching the current direction (boost mechanic)
-	var held_direction := Vector2.ZERO
-	if Input.is_action_pressed("move_up"):
-		held_direction.y = -1.0
-	elif Input.is_action_pressed("move_down"):
-		held_direction.y = 1.0
-	
-	if Input.is_action_pressed("move_left"):
-		held_direction.x = -1.0
-	elif Input.is_action_pressed("move_right"):
-		held_direction.x = 1.0
+	var held_direction := _get_input_direction()
 	
 	# Determine target speed based on whether held keys match current direction
 	var target_speed := SNAKE_MAX_SPEED_AUTO
 	var keys_match_direction := false
 	
 	if held_direction != Vector2.ZERO:
-		held_direction = held_direction.normalized()
 		# If held direction closely matches current direction, track boost timer
 		if held_direction.dot(current_direction) > 0.9:
 			keys_match_direction = true
@@ -222,16 +202,24 @@ func _handle_automatic_movement(delta: float):
 	
 	# Check if we should adjust direction for wall sliding (continuous check)
 	var final_direction := _adjust_direction_for_wall_sliding(current_direction)
+	if final_direction != Vector2.ZERO:
+		last_effective_direction = _snap_to_8_way_direction(final_direction)
 	
 	# Always move in the final direction
 	apply_central_force(final_direction.normalized() * current_speed)
 
 
-func _handle_manual_movement():
-	"""Handle manual movement mode (original behavior for easy mode)."""
+func _get_input_direction() -> Vector2:
+
+	if Global.is_fpv_controls_enabled():
+		return _get_fpv_input_direction()
 	
+	return _get_absolute_input_direction()
+
+
+func _get_absolute_input_direction() -> Vector2:
+
 	var direction := Vector2.ZERO
-	
 	if Input.is_action_pressed("move_up"):
 		direction.y = -1.0
 	elif Input.is_action_pressed("move_down"):
@@ -242,11 +230,59 @@ func _handle_manual_movement():
 	elif Input.is_action_pressed("move_right"):
 		direction.x = 1.0
 
-	if direction.length() > 0:
-		apply_central_force(direction.normalized() * current_speed)
-		current_speed = minf(current_speed + SNAKE_ACCELERATION, SNAKE_MAX_SPEED)
-	else:
-		current_speed = SNAKE_MIN_SPEED
+	return direction.normalized() if direction != Vector2.ZERO else Vector2.ZERO
+
+
+func _get_fpv_input_direction() -> Vector2:
+
+	var direction := Vector2.ZERO
+	var forward := _get_fpv_forward_direction()
+	var left := forward.rotated(-PI / 2.0)
+	var right := forward.rotated(PI / 2.0)
+
+	if Input.is_action_pressed("move_up"):
+		direction += forward
+
+	if Input.is_action_pressed("move_left"):
+		direction += left
+	elif Input.is_action_pressed("move_right"):
+		direction += right
+
+	if direction == Vector2.ZERO:
+		return Vector2.ZERO
+
+	return _snap_to_8_way_direction(direction)
+
+
+func _get_fpv_forward_direction() -> Vector2:
+
+	if linear_velocity.length() >= MIN_EFFECTIVE_DIRECTION_SPEED:
+		return _snap_to_8_way_direction(linear_velocity)
+	
+	if last_effective_direction != Vector2.ZERO:
+		return last_effective_direction
+	
+	return _snap_to_8_way_direction(current_direction)
+
+
+func _snap_to_8_way_direction(direction: Vector2) -> Vector2:
+
+	if direction == Vector2.ZERO:
+		return Vector2.ZERO
+	
+	var normalized_direction := direction.normalized()
+	var abs_x := absf(normalized_direction.x)
+	var abs_y := absf(normalized_direction.y)
+	var sign_x := -1.0 if normalized_direction.x < 0.0 else 1.0
+	var sign_y := -1.0 if normalized_direction.y < 0.0 else 1.0
+	
+	if abs_x > abs_y * EIGHT_WAY_AXIS_DOMINANCE:
+		return Vector2(sign_x, 0.0)
+	
+	if abs_y > abs_x * EIGHT_WAY_AXIS_DOMINANCE:
+		return Vector2(0.0, sign_y)
+	
+	return Vector2(sign_x, sign_y).normalized()
 
 
 func _on_body_entered( body: Node ):
@@ -471,10 +507,6 @@ func _adjust_direction_for_wall_proximity(desired_direction: Vector2) -> Vector2
 	When approaching a wall, creates a diagonal. This is called on input changes.
 	"""
 	
-	# Only apply this adjustment in auto-move mode
-	if not Global.auto_move:
-		return desired_direction
-	
 	# Check if the desired direction would move toward a nearby wall
 	var wall_detected := false
 	var parallel_component := Vector2.ZERO
@@ -529,10 +561,6 @@ func _adjust_direction_for_wall_sliding(movement_direction: Vector2) -> Vector2:
 	Continuously adjust movement direction when sliding along walls.
 	This prevents slowdown by switching to pure parallel movement when touching a wall.
 	"""
-	
-	# Only apply this adjustment in auto-move mode
-	if not Global.auto_move:
-		return movement_direction
 	
 	# Check each wall direction
 	var checks := [

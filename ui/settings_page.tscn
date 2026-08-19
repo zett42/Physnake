@@ -41,6 +41,23 @@ theme_override_colors/font_color = Color(0.701961, 0.701961, 0.701961, 1)
 theme_override_font_sizes/font_size = 20
 text = "Fullscreen"
 
+[node name="FpvControlsCheckButton" type="CheckButton" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -111.0
+offset_top = 36.0
+offset_right = 111.0
+offset_bottom = 76.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.701961, 0.701961, 0.701961, 1)
+theme_override_font_sizes/font_size = 20
+text = "FPV Controls"
+
 [node name="BackButton" type="Button" parent="."]
 layout_mode = 1
 anchors_preset = 3
@@ -58,4 +75,5 @@ theme_override_font_sizes/font_size = 20
 text = "Back"
 
 [connection signal="toggled" from="FullscreenCheckButton" to="." method="_on_fullscreen_check_button_toggled"]
+[connection signal="toggled" from="FpvControlsCheckButton" to="." method="_on_fpv_controls_check_button_toggled"]
 [connection signal="pressed" from="BackButton" to="." method="_on_back_button_pressed"]
