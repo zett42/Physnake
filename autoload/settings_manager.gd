@@ -17,12 +17,6 @@ enum AntialiasingLevel {
 	MSAA_8X = Viewport.MSAA_8X,
 }
 
-enum PhysicsFramerate {
-	FPS_60 = 60,
-	FPS_90 = 90,
-	FPS_120 = 120,
-}
-
 enum VSyncMode {
 	DISABLED = DisplayServer.VSYNC_DISABLED,
 	ENABLED = DisplayServer.VSYNC_ENABLED,
@@ -38,7 +32,6 @@ var show_fps: bool = false
 var fpv_controls: bool = false
 var detail_level: DetailLevel = DetailLevel.HIGH
 var antialiasing_level: AntialiasingLevel = AntialiasingLevel.MSAA_8X
-var physics_framerate: PhysicsFramerate = PhysicsFramerate.FPS_120
 
 
 func load_settings():
@@ -55,7 +48,6 @@ func load_settings():
 	fpv_controls = config.get_value("controls", "fpv_controls", false)
 	detail_level = _get_valid_detail_level(config.get_value("display", "detail_level", DetailLevel.HIGH))
 	antialiasing_level = _get_valid_antialiasing_level(config.get_value("display", "antialiasing_level", AntialiasingLevel.MSAA_8X))
-	physics_framerate = _get_valid_physics_framerate(config.get_value("performance", "physics_framerate", PhysicsFramerate.FPS_120))
 	window_position = Vector2i(
 		config.get_value("display", "window_x", 0),
 		config.get_value("display", "window_y", 0)
@@ -78,7 +70,6 @@ func save_settings():
 	config.set_value("display", "window_height", window_size.y)
 	config.set_value("display", "detail_level", detail_level)
 	config.set_value("display", "antialiasing_level", antialiasing_level)
-	config.set_value("performance", "physics_framerate", physics_framerate)
 	config.set_value("controls", "fpv_controls", fpv_controls)
 
 	var err = config.save(SETTINGS_FILE)
@@ -143,21 +134,10 @@ func set_antialiasing_level(level: AntialiasingLevel):
 	save_settings()
 
 
-func set_physics_framerate(framerate: PhysicsFramerate):
-	framerate = _get_valid_physics_framerate(framerate)
-	if physics_framerate == framerate:
-		return
-
-	physics_framerate = framerate
-	_apply_physics_framerate()
-	save_settings()
-
-
 func apply_startup_settings():
 	_apply_window_mode()
 	_apply_vsync()
 	_apply_antialiasing_level()
-	_apply_physics_framerate()
 
 	if not fullscreen and not maximized:
 		_restore_window_bounds()
@@ -324,10 +304,6 @@ func _apply_antialiasing_level():
 		viewport.msaa_2d = antialiasing_level as Viewport.MSAA
 
 
-func _apply_physics_framerate():
-	Engine.physics_ticks_per_second = physics_framerate
-
-
 func _get_valid_detail_level(value) -> DetailLevel:
 	if typeof(value) != TYPE_INT:
 		return DetailLevel.HIGH
@@ -368,15 +344,3 @@ func _get_valid_vsync_mode(value) -> VSyncMode:
 
 	return mode as VSyncMode
 
-
-func _get_valid_physics_framerate(value) -> PhysicsFramerate:
-	if typeof(value) != TYPE_INT:
-		return PhysicsFramerate.FPS_120
-
-	var framerate := int(value)
-	if framerate != PhysicsFramerate.FPS_60 \
-			and framerate != PhysicsFramerate.FPS_90 \
-			and framerate != PhysicsFramerate.FPS_120:
-		return PhysicsFramerate.FPS_120
-
-	return framerate as PhysicsFramerate

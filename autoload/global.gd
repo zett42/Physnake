@@ -196,14 +196,6 @@ func set_antialiasing_level(level: SettingsManager.AntialiasingLevel):
 	settings.set_antialiasing_level(level)
 
 
-func get_physics_framerate() -> SettingsManager.PhysicsFramerate:
-	return settings.physics_framerate
-
-
-func set_physics_framerate(framerate: SettingsManager.PhysicsFramerate):
-	settings.set_physics_framerate(framerate)
-
-
 func _save_window_bounds():
 	settings.set_window_bounds(
 		DisplayServer.window_get_position_with_decorations(),
