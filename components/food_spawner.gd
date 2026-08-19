@@ -12,6 +12,7 @@ const GOLDEN_FOOD_PROBABILITY: float = 0.05
 
 @onready var _shape_cast_normal := $ShapeCast_normal as ShapeCast2D
 @onready var _shape_cast_big    := $ShapeCast_big as ShapeCast2D
+@onready var _golden_spawn_sound := $GoldenSpawnSound as AudioStreamPlayer
 
 
 func _process( _delta ):
@@ -51,4 +52,6 @@ func _spawn_food():
 			food.food_nutrition = randi_range(1, Food.MAX_NUTRITION)
 		
 			get_parent().add_child( food )	
+			if food_type == Food.FoodType.GOLDEN:
+				_golden_spawn_sound.play()
 			break
