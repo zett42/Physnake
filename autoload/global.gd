@@ -36,6 +36,10 @@ func _ready():
 	settings.apply_startup_settings()
 
 
+func _exit_tree():
+	_save_window_bounds()
+
+
 func reset_game_state():
 
 	_is_game_over = false
@@ -101,3 +105,11 @@ func is_fullscreen_enabled() -> bool:
 
 func set_fullscreen(enabled: bool):
 	settings.set_fullscreen(enabled)
+
+
+func _save_window_bounds():
+	settings.set_window_bounds(
+		DisplayServer.window_get_position_with_decorations(),
+		DisplayServer.window_get_size(),
+		DisplayServer.window_get_mode()
+	)
