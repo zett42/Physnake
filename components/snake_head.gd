@@ -74,6 +74,8 @@ var wall_raycast_right: RayCast2D
 # Head collision radius (retrieved from collision shape)
 var head_radius: float = 15.0
 
+@onready var time_bonus_indicator := $TimeBonusIndicator as SnakeTimeBonusIndicator
+
 
 func _ready():
 	
@@ -118,6 +120,7 @@ func _process( delta ):
 	
 	time_bonus = maxf( 0, time_bonus - MAX_TIME_BONUS / TIME_BONUS_DURATION * delta )
 	Global.time_bonus = ceili( time_bonus )
+	time_bonus_indicator.set_bonus_segments(controller.segments, time_bonus)
 	
 	# Check if we should spawn buffered segments based on tail movement
 	_check_tail_spawning()
@@ -313,6 +316,7 @@ func _on_body_entered( body: Node ):
 		if impact_speed >= DEADLY_WALL_IMPACT_THRESHOLD:
 			$OuchSound.play()
 			if poisoned_animation != null:
+				time_bonus_indicator.clear_highlights()
 				# Start animation from head (collision_index = -1)
 				poisoned_animation.start_animation(-1)
 			Global.set_game_over()
@@ -328,6 +332,7 @@ func _on_body_entered( body: Node ):
 			if segment_index >= 2:
 				$OuchSound.play()
 				if poisoned_animation != null:
+					time_bonus_indicator.clear_highlights()
 					poisoned_animation.start_animation(segment_index)
 				Global.set_game_over()
 				return
@@ -352,6 +357,7 @@ func _on_body_entered( body: Node ):
 		Global.add_bonus( ceili( time_bonus ) * base_score )
 		
 		time_bonus = MAX_TIME_BONUS
+		time_bonus_indicator.set_bonus_segments(controller.segments, time_bonus)
 
 
 func _buffer_food( food_size: Food.FoodSize, food_nutrition: int = 1 ):

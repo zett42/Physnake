@@ -1,9 +1,10 @@
-[gd_scene format=3 uid="uid://c8j7mxxvdsagi"]
+[gd_scene load_steps=9 format=3 uid="uid://c8j7mxxvdsagi"]
 
 [ext_resource type="Script" uid="uid://crgklbpvv4f0l" path="res://components/snake_head.gd" id="1_mu00g"]
 [ext_resource type="Script" uid="uid://dpd1qp8ynkn5g" path="res://shapes/visible_circle_shape_2d.gd" id="2_qv0n0"]
 [ext_resource type="AudioStream" uid="uid://cmw7b1ptnb5kn" path="res://sounds/eat.wav" id="3_pldhu"]
 [ext_resource type="AudioStream" uid="uid://b6wkky0imim61" path="res://sounds/ouch.wav" id="4_ouch"]
+[ext_resource type="Script" path="res://components/snake_time_bonus_indicator.gd" id="5_bonus"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_frictionless"]
 friction = 0.0
@@ -45,6 +46,9 @@ polygon = PackedVector2Array(12, -2.9390552e-15, 11.7694235, -2.3410838, 11.0865
 [node name="InnerBorder" type="Polygon2D" parent="VisibleShape" unique_id=1166813026]
 color = Color(0, 0, 0, 1)
 polygon = PackedVector2Array(5, -1.2246064e-15, 4.9039264, -0.9754516, 4.6193976, -1.9134172, 4.157348, -2.777851, 3.535534, -3.535534, 2.777851, -4.157348, 1.9134172, -4.6193976, 0.9754516, -4.9039264, -9.184548e-16, -5, -0.9754516, -4.9039264, -1.9134172, -4.6193976, -2.777851, -4.157348, -3.535534, -3.535534, -4.157348, -2.777851, -4.6193976, -1.9134172, -4.9039264, -0.9754516, -5, 6.123032e-16, -4.9039264, 0.9754516, -4.6193976, 1.9134172, -4.157348, 2.777851, -3.535534, 3.535534, -2.777851, 4.157348, -1.9134172, 4.6193976, -0.9754516, 4.9039264, 3.061516e-16, 5, 0.9754516, 4.9039264, 1.9134172, 4.6193976, 2.777851, 4.157348, 3.535534, 3.535534, 4.157348, 2.777851, 4.6193976, 1.9134172, 4.9039264, 0.9754516)
+
+[node name="TimeBonusIndicator" type="Node2D" parent="."]
+script = ExtResource("5_bonus")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=741106527]
 visible = false
