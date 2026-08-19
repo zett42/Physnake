@@ -3,6 +3,8 @@ extends RefCounted
 
 
 const SETTINGS_FILE = "user://settings.cfg"
+const EDITOR_SETTINGS_FILE = "user://settings_editor.cfg"
+const MIN_WINDOW_SIZE = Vector2i(640, 360)
 
 enum DetailLevel {
 	LOW,
@@ -36,7 +38,7 @@ var antialiasing_level: AntialiasingLevel = AntialiasingLevel.MSAA_8X
 
 func load_settings():
 	var config = ConfigFile.new()
-	var err = config.load(SETTINGS_FILE)
+	var err = config.load(_get_settings_file())
 
 	if err != OK:
 		return
@@ -56,6 +58,9 @@ func load_settings():
 		config.get_value("display", "window_width", 0),
 		config.get_value("display", "window_height", 0)
 	)
+	if not _is_valid_window_size(window_size):
+		window_position = Vector2i.ZERO
+		window_size = Vector2i.ZERO
 
 
 func save_settings():
@@ -72,7 +77,7 @@ func save_settings():
 	config.set_value("display", "antialiasing_level", antialiasing_level)
 	config.set_value("controls", "fpv_controls", fpv_controls)
 
-	var err = config.save(SETTINGS_FILE)
+	var err = config.save(_get_settings_file())
 	if err != OK:
 		push_error("Failed to save settings: " + str(err))
 
@@ -144,7 +149,7 @@ func apply_startup_settings():
 
 
 func set_window_bounds(position: Vector2i, size: Vector2i, window_mode: DisplayServer.WindowMode):
-	if fullscreen or size == Vector2i.ZERO:
+	if fullscreen or window_mode == DisplayServer.WINDOW_MODE_MINIMIZED or not _is_valid_window_size(size):
 		return
 
 	var is_maximized = window_mode == DisplayServer.WINDOW_MODE_MAXIMIZED
@@ -158,7 +163,7 @@ func set_window_bounds(position: Vector2i, size: Vector2i, window_mode: DisplayS
 
 
 func _restore_window_bounds():
-	if window_size == Vector2i.ZERO:
+	if not _is_valid_window_size(window_size):
 		window_size = _get_default_window_size()
 		window_position = _get_centered_window_position(window_size)
 		_apply_window_bounds(window_position, window_size)
@@ -191,6 +196,14 @@ func _get_default_window_size() -> Vector2i:
 	)
 	var screen_rect = DisplayServer.screen_get_usable_rect(DisplayServer.window_get_current_screen())
 	return project_default_size.min(_get_max_client_size_for_screen(screen_rect))
+
+
+func _is_valid_window_size(size: Vector2i) -> bool:
+	return size.x >= MIN_WINDOW_SIZE.x and size.y >= MIN_WINDOW_SIZE.y
+
+
+func _get_settings_file() -> String:
+	return EDITOR_SETTINGS_FILE if OS.has_feature("editor") else SETTINGS_FILE
 
 
 func _get_centered_window_position(size: Vector2i) -> Vector2i:
@@ -343,4 +356,3 @@ func _get_valid_vsync_mode(value) -> VSyncMode:
 		return VSyncMode.ENABLED
 
 	return mode as VSyncMode
-
