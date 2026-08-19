@@ -79,7 +79,7 @@ theme_override_font_sizes/font_size = 35
 text = "snake length:"
 horizontal_alignment = 1
 
-[node name="Difficulty" type="Label" parent="."]
+[node name="AvgSpeed" type="Label" parent="."]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -90,6 +90,23 @@ offset_left = -276.0
 offset_top = 80.0
 offset_right = 282.0
 offset_bottom = 140.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 35
+text = "avg speed:"
+horizontal_alignment = 1
+
+[node name="Difficulty" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -276.0
+offset_top = 132.0
+offset_right = 282.0
+offset_bottom = 192.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 35
@@ -104,9 +121,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -121.5
-offset_top = 178.0
+offset_top = 220.0
 offset_right = 121.5
-offset_bottom = 241.0
+offset_bottom = 283.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 40

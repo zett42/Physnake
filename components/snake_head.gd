@@ -61,6 +61,7 @@ var poisoned_animation: SnakePoisonedAnimation = null
 # Force-based wall collision detection
 var last_velocity: Vector2 = Vector2.ZERO  # Track velocity for impact detection
 var last_contact_normal: Vector2 = Vector2.ZERO  # Contact normal from last collision
+var last_speed_sample_position: Vector2 = Vector2.ZERO
 
 # Wall proximity detection to prevent slowdown exploit
 const WALL_PROXIMITY_DISTANCE: float = 50.0  # Distance to check for nearby walls
@@ -112,6 +113,7 @@ func _ready():
 	
 	# Setup wall proximity detection raycasts
 	_setup_wall_proximity_raycasts()
+	last_speed_sample_position = global_position
 
 	# Add initial snake tail. As tree is locked in _ready(), it must be called deferred.
 	call_deferred( "_spawn_tail", Food.FoodSize.NORMAL )
@@ -123,7 +125,7 @@ func _process( delta ):
 		# Play death animation
 		poisoned_animation.update_animation(delta)
 		return
-	
+
 	time_bonus = maxf( 0, time_bonus - MAX_TIME_BONUS / TIME_BONUS_DURATION * delta )
 	Global.time_bonus = ceili( time_bonus )
 	time_bonus_indicator.set_bonus_segments(controller.segments, time_bonus)
@@ -143,12 +145,21 @@ func _update_visual_direction():
 		$VisibleShape.rotation = direction.angle()
 
 
+func _track_head_movement(delta: float):
+
+	var distance := global_position.distance_to(last_speed_sample_position)
+	last_speed_sample_position = global_position
+	Global.add_head_movement(distance, delta)
+
+
 func _integrate_forces( state: PhysicsDirectBodyState2D ):
 
 	if Global.is_game_over():
 		# Store velocity even during game over for proper animation
 		last_velocity = linear_velocity
 		return
+
+	_track_head_movement(state.step)
 	
 	# Track velocity for force-based collision detection
 	last_velocity = linear_velocity

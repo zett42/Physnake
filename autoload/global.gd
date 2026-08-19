@@ -24,6 +24,8 @@ enum Difficulty {
 
 var total_score: int = 0
 var total_bonus: int = 0
+var total_head_distance: float = 0.0
+var play_time: float = 0.0
 
 var _is_game_over: bool = false
 var _detail_level_applier := DetailLevelApplier.new()
@@ -48,6 +50,9 @@ func reset_game_state():
 	_is_game_over = false
 	total_score = 0
 	total_bonus = 0
+	total_head_distance = 0.0
+	play_time = 0.0
+	update_speed_display()
 		
 
 func get_total_score():
@@ -58,6 +63,34 @@ func get_total_score():
 func get_total_bonus():
 
 	return total_bonus
+
+
+func get_total_head_distance() -> float:
+
+	return total_head_distance
+
+
+func get_play_time() -> float:
+
+	return play_time
+
+
+func get_average_speed() -> float:
+
+	if play_time <= 0.0:
+		return 0.0
+
+	return total_head_distance / play_time
+
+
+func add_head_movement(distance: float, delta: float):
+
+	if _is_game_over:
+		return
+
+	total_head_distance += maxf(distance, 0.0)
+	play_time += maxf(delta, 0.0)
+	update_speed_display()
 	
 	
 func is_game_over() -> bool:
@@ -85,6 +118,13 @@ func update_score_display():
 	var score_node = get_node("/root/Room/ScorePanel/Score")
 	if score_node:
 		score_node.text = "Score: %d" % total_score
+
+
+func update_speed_display():
+
+	var speed_node = get_node_or_null("/root/Room/ScorePanel/AvgSpeed")
+	if speed_node:
+		speed_node.text = "Avg Speed: %.0f" % get_average_speed()
 
 
 func set_game_over():

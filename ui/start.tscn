@@ -1,9 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://cenyjt0ukwgr5"]
+[gd_scene format=3 uid="uid://cenyjt0ukwgr5"]
 
 [ext_resource type="Script" uid="uid://dwh1hi8eg46yx" path="res://ui/start.gd" id="1_c2p6v"]
 [ext_resource type="PackedScene" uid="uid://dj2vjy4yx4b7w" path="res://ui/about.tscn" id="2_about"]
 
-[node name="Start" type="ColorRect"]
+[node name="Start" type="ColorRect" unique_id=1796208293]
 process_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -13,7 +13,7 @@ grow_vertical = 2
 color = Color(0.158472, 0.158472, 0.158472, 1)
 script = ExtResource("1_c2p6v")
 
-[node name="ChooseLabel" type="Label" parent="."]
+[node name="ChooseLabel" type="Label" parent="." unique_id=1388889449]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -25,7 +25,7 @@ theme_override_font_sizes/font_size = 40
 text = "CHOOSE DIFFICULTY:"
 horizontal_alignment = 1
 
-[node name="EasyButton" type="Button" parent="."]
+[node name="EasyButton" type="Button" parent="." unique_id=89988527]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 1
 anchors_preset = 8
@@ -42,7 +42,7 @@ grow_vertical = 2
 theme_override_font_sizes/font_size = 40
 text = "EASY"
 
-[node name="NormalButton" type="Button" parent="."]
+[node name="NormalButton" type="Button" parent="." unique_id=1250280066]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 1
 anchors_preset = 8
@@ -59,7 +59,7 @@ grow_vertical = 2
 theme_override_font_sizes/font_size = 40
 text = "NORMAL"
 
-[node name="HardButton" type="Button" parent="."]
+[node name="HardButton" type="Button" parent="." unique_id=1888812643]
 custom_minimum_size = Vector2(200, 0)
 layout_mode = 1
 anchors_preset = 8
@@ -76,7 +76,7 @@ grow_vertical = 2
 theme_override_font_sizes/font_size = 40
 text = "HARD"
 
-[node name="HighScoresContainer" type="VBoxContainer" parent="."]
+[node name="HighScoresContainer" type="VBoxContainer" parent="." unique_id=143203227]
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
@@ -86,31 +86,31 @@ offset_bottom = 328.0
 grow_horizontal = 2
 alignment = 1
 
-[node name="HighScoresTitle" type="Label" parent="HighScoresContainer"]
+[node name="HighScoresTitle" type="Label" parent="HighScoresContainer" unique_id=621908009]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
 theme_override_font_sizes/font_size = 24
 text = "HIGH SCORES:"
 
-[node name="EasyHighScore" type="Label" parent="HighScoresContainer"]
+[node name="EasyHighScore" type="Label" parent="HighScoresContainer" unique_id=1517353371]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 theme_override_font_sizes/font_size = 18
 text = "EASY: ---"
 
-[node name="NormalHighScore" type="Label" parent="HighScoresContainer"]
+[node name="NormalHighScore" type="Label" parent="HighScoresContainer" unique_id=1308913095]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 theme_override_font_sizes/font_size = 18
 text = "NORMAL: ---"
 
-[node name="HardHighScore" type="Label" parent="HighScoresContainer"]
+[node name="HardHighScore" type="Label" parent="HighScoresContainer" unique_id=763526477]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 theme_override_font_sizes/font_size = 18
 text = "HARD: ---"
 
-[node name="ControlsLabel" type="Label" parent="."]
+[node name="ControlsLabel" type="Label" parent="." unique_id=386215489]
 modulate = Color(0.741176, 0.741176, 0.741176, 1)
 layout_mode = 1
 anchors_preset = 10
@@ -129,7 +129,7 @@ Be kind to yourself — your tail is not food.
 Walls are friendly… unless hugged excessively."
 horizontal_alignment = 1
 
-[node name="ExitButton" type="Button" parent="."]
+[node name="ExitButton" type="Button" parent="." unique_id=920400220]
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
@@ -145,7 +145,7 @@ grow_vertical = 0
 theme_override_font_sizes/font_size = 20
 text = "Exit"
 
-[node name="AboutButton" type="Button" parent="."]
+[node name="AboutButton" type="Button" parent="." unique_id=70580755]
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
@@ -161,7 +161,7 @@ grow_vertical = 0
 theme_override_font_sizes/font_size = 20
 text = "About"
 
-[node name="SettingsButton" type="Button" parent="."]
+[node name="SettingsButton" type="Button" parent="." unique_id=1905947419]
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
@@ -177,7 +177,7 @@ grow_vertical = 0
 theme_override_font_sizes/font_size = 20
 text = "Settings"
 
-[node name="About" parent="." instance=ExtResource("2_about")]
+[node name="About" parent="." unique_id=2132461509 instance=ExtResource("2_about")]
 
 [connection signal="pressed" from="EasyButton" to="." method="_on_easy_button_pressed"]
 [connection signal="pressed" from="NormalButton" to="." method="_on_normal_button_pressed"]
