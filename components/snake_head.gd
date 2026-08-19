@@ -66,7 +66,6 @@ const INPUT_DIRECTION_THRESHOLD: float = 0.05  # Minimum input to detect directi
 const MIN_EFFECTIVE_DIRECTION_SPEED: float = 10.0  # Minimum speed used to derive FPV direction from velocity
 const EIGHT_WAY_AXIS_DOMINANCE: float = 2.41421356237  # tan(67.5 degrees), for nearest 45-degree snap
 const MIN_VISUAL_DIRECTION_LENGTH_SQUARED := 1.0
-
 var wall_raycast_up: RayCast2D
 var wall_raycast_down: RayCast2D
 var wall_raycast_left: RayCast2D
@@ -122,14 +121,17 @@ func _process( delta ):
 	
 	# Check if we should spawn buffered segments based on tail movement
 	_check_tail_spawning()
+	_update_visual_direction()
 
 
-func set_visual_direction(direction: Vector2):
+func _update_visual_direction():
 
+	var direction := linear_velocity
 	if direction.length_squared() < MIN_VISUAL_DIRECTION_LENGTH_SQUARED:
-		return
+		direction = current_direction
 
-	$VisibleShape.rotation = direction.angle()
+	if direction.length_squared() >= MIN_VISUAL_DIRECTION_LENGTH_SQUARED:
+		$VisibleShape.rotation = direction.angle()
 
 
 func _integrate_forces( state: PhysicsDirectBodyState2D ):

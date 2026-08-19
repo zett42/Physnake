@@ -57,7 +57,6 @@ func _physics_process(_delta: float) -> void:
 	
 	# Update segment targets
 	_update_segment_targets()
-	_update_visual_directions()
 	
 	# Clean up old breadcrumbs to avoid unbounded growth
 	_cleanup_breadcrumbs()
@@ -182,41 +181,6 @@ func _apply_guidance_force(segment: RigidBody2D, target_position: Vector2, drive
 	
 	# Apply the force
 	segment.apply_central_force(force)
-
-
-func _update_visual_directions() -> void:
-	"""Align snake visuals to the local chain direction."""
-	
-	_update_head_visual_direction()
-
-	for i in range(segments.size()):
-		var segment := segments[i] as SnakeBody
-		if not is_instance_valid(segment):
-			continue
-
-		var direction := Vector2.ZERO
-		var previous_node := head if i == 0 else segments[i - 1]
-		if is_instance_valid(previous_node):
-			if i < segments.size() - 1 and is_instance_valid(segments[i + 1]):
-				direction = previous_node.global_position - segments[i + 1].global_position
-			else:
-				direction = previous_node.global_position - segment.global_position
-
-		segment.set_visual_direction(direction)
-
-
-func _update_head_visual_direction() -> void:
-
-	if not head.has_method("set_visual_direction"):
-		return
-
-	var direction := Vector2.ZERO
-	if segments.size() > 0 and is_instance_valid(segments[0]):
-		direction = head.global_position - segments[0].global_position
-	elif head.linear_velocity.length_squared() > 1.0:
-		direction = head.linear_velocity
-
-	head.set_visual_direction(direction)
 
 
 func _cleanup_breadcrumbs() -> void:
