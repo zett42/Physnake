@@ -1,5 +1,7 @@
 extends CanvasLayer
 
+const settings_scene := preload("res://ui/settings_page.tscn")
+
 @onready var color_rect = $ColorRect
 
 func _ready():
@@ -45,6 +47,12 @@ func resume_without_fade():
 func _on_continue_button_pressed():
 	# Resume with fade effect
 	fade_out_and_resume()
+
+func _on_settings_button_pressed():
+	var settings_page := settings_scene.instantiate()
+	if settings_page.has_method("use_pause_overlay_mode"):
+		settings_page.use_pause_overlay_mode()
+	add_child(settings_page)
 
 func _on_main_menu_button_pressed():
 	resume_without_fade()

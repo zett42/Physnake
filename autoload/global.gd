@@ -1,6 +1,7 @@
 extends Node
 
 signal detail_level_changed(level: SettingsManager.DetailLevel)
+signal show_fps_changed(enabled: bool)
 
 @export var time_bonus: int = 0:
 	get:
@@ -122,7 +123,10 @@ func is_show_fps_enabled() -> bool:
 
 
 func set_show_fps(enabled: bool):
+	var previous_enabled := settings.show_fps
 	settings.set_show_fps(enabled)
+	if settings.show_fps != previous_enabled:
+		show_fps_changed.emit(settings.show_fps)
 
 
 func is_fpv_controls_enabled() -> bool:

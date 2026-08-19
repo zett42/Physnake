@@ -1,5 +1,11 @@
 extends ColorRect
 
+var _pause_overlay_mode := false
+
+
+func use_pause_overlay_mode():
+	_pause_overlay_mode = true
+
 
 func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
@@ -41,6 +47,10 @@ func _on_physics_framerate_option_button_item_selected(index: int):
 
 
 func _on_back_button_pressed():
+	if _pause_overlay_mode:
+		queue_free()
+		return
+
 	get_tree().change_scene_to_file("res://ui/start.tscn")
 
 
