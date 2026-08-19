@@ -19,9 +19,6 @@ func _ready():
 	# Physics steps haven't run for this object yet, so call_deferred() is not required.
 	_update_body_size()
 	
-	# Enable Continuous Collision Detection for fast-moving segments
-	continuous_cd = RigidBody2D.CCD_MODE_CAST_RAY
-
 	# Low detail modes make circular segments visibly faceted, so keep them from spinning.
 	lock_rotation = true
 
