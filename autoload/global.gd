@@ -32,6 +32,11 @@ var _detail_level_applier := DetailLevelApplier.new()
 var settings := SettingsManager.new()
 
 
+func get_difficulty_name(diff: Difficulty) -> String:
+
+	return Difficulty.keys()[diff]
+
+
 func _ready():
 	
 	settings.load_settings()
