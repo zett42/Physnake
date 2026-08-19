@@ -4,6 +4,7 @@ const food_scene = preload("res://components/food.tscn")
 
 # Propability that big food is spawned (0..1)
 const BIG_FOOD_PROPABILITY: float = 0.1
+const GOLDEN_FOOD_PROBABILITY: float = 0.05
 
 
 @export var food_count: int = 25
@@ -28,6 +29,7 @@ func _process( _delta ):
 func _spawn_food():
 	
 	var food_size = Food.FoodSize.NORMAL if randf() > BIG_FOOD_PROPABILITY else Food.FoodSize.BIG
+	var food_type = Food.FoodType.GOLDEN if randf() < GOLDEN_FOOD_PROBABILITY else Food.FoodType.REGULAR
 
 	# Try to find an unoccluded location for spawning food.
 	
@@ -45,6 +47,7 @@ func _spawn_food():
 			var food = food_scene.instantiate()
 			food.position = shape_cast.position
 			food.food_size = food_size
+			food.food_type = food_type
 			food.food_nutrition = randi_range(1, Food.MAX_NUTRITION)
 		
 			get_parent().add_child( food )	

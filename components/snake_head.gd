@@ -344,7 +344,8 @@ func _on_body_entered( body: Node ):
 
 		# Calculate score before triggering the effect so particles can reflect the awarded value.
 		var food_size_multiplier = 2.0 if body.food_size == Food.FoodSize.BIG else 1.0
-		var base_score = int(body.food_nutrition * food_size_multiplier)
+		var snake_length := controller.get_segment_count() if controller != null else 0
+		var base_score = int(body.food_nutrition * food_size_multiplier * body.get_score_multiplier(snake_length))
 		var bonus_score = ceili( time_bonus ) * base_score
 		var awarded_points = base_score + bonus_score
 

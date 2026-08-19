@@ -6,15 +6,31 @@ enum FoodSize {
 	BIG,
 }
 
+enum FoodType {
+	REGULAR,
+	GOLDEN,
+}
+
 const MAX_NUTRITION: int = 3
 const RING_SEGMENTS_PER_RADIUS := 3.0
 const MIN_RING_SEGMENTS := 12
 const MAX_COLLECTION_EFFECT_POINTS := 36.0
 const LOW_VALUE_PARTICLE_COLOR := Color(0.235294, 1.0, 0.0, 1.0)
 const HIGH_VALUE_PARTICLE_COLOR := Color(0.45, 1.0, 0.87, 1.0)
+const REGULAR_COLOR := Color(0.235294, 1.0, 0.0, 1.0)
+const GOLDEN_COLOR := Color(1.0, 0.78, 0.08, 1.0)
+const GOLDEN_PULSE_COLOR := Color(1.0, 0.95, 0.32, 1.0)
+const GOLDEN_LIFETIME_SECONDS := 6.0
+const GOLDEN_SCORE_MULTIPLIER := 3
+const GOLDEN_LENGTH_BONUS_SEGMENTS := 5
+const GOLDEN_PULSE_SPEED := 5.0
+const GOLDEN_PULSE_SCALE := 1.08
+const TIMEOUT_RING_RADIUS_PADDING := 4.0
+const TIMEOUT_RING_WIDTH := 2.5
 
 @export var food_size: FoodSize = FoodSize.NORMAL
 @export var food_nutrition: int = 1
+@export var food_type: FoodType = FoodType.REGULAR
 
 var show_detail_rings := true:
 	set(value):
@@ -25,9 +41,16 @@ var show_detail_rings := true:
 		_update_tail_count_ring_visibility()
 
 var _tail_count_rings: Array[Node2D] = []
+var _pulse_time := 0.0
+var _normal_shape_scale := Vector2.ONE
+var _big_shape_scale := Vector2.ONE
+var _lifetime_timer: Timer = null
+var _timeout_indicator: VisibleCircleShape2D = null
 
 
 func _ready():
+	_normal_shape_scale = $Shape_normal.scale
+	_big_shape_scale = $Shape_big.scale
 	
 	match food_size:
 		FoodSize.NORMAL:
@@ -42,6 +65,23 @@ func _ready():
 			$CollisionShape_normal.set_deferred("disabled", true )
 			$CollisionShape_big.set_deferred("disabled", false )
 			_setup_tail_count_rings($Shape_big, 15.0)
+
+	_apply_food_type_visuals()
+	set_process(food_type == FoodType.GOLDEN)
+
+	if is_timed():
+		_setup_timeout_indicator()
+		_start_lifetime_timer()
+
+
+func _process(delta: float):
+
+	if food_type != FoodType.GOLDEN:
+		return
+
+	_pulse_time += delta * GOLDEN_PULSE_SPEED
+	_apply_food_type_visuals()
+	_update_timeout_indicator()
 
 
 func _setup_tail_count_rings(parent_node: Node2D, base_radius: float):
@@ -78,6 +118,93 @@ func _update_tail_count_ring_visibility():
 			ring.visible = show_detail_rings
 
 
+func get_score_multiplier(snake_length: int = 0) -> int:
+
+	match food_type:
+		FoodType.GOLDEN:
+			return GOLDEN_SCORE_MULTIPLIER + floori(float(snake_length) / GOLDEN_LENGTH_BONUS_SEGMENTS)
+		_:
+			return 1
+
+
+func is_timed() -> bool:
+
+	return food_type == FoodType.GOLDEN
+
+
+func get_lifetime_seconds() -> float:
+
+	match food_type:
+		FoodType.GOLDEN:
+			return GOLDEN_LIFETIME_SECONDS
+		_:
+			return 0.0
+
+
+func _apply_food_type_visuals():
+
+	match food_type:
+		FoodType.GOLDEN:
+			var pulse := (sin(_pulse_time) + 1.0) * 0.5
+			modulate = GOLDEN_COLOR.lerp(GOLDEN_PULSE_COLOR, pulse)
+
+			var pulse_scale := lerpf(1.0, GOLDEN_PULSE_SCALE, pulse)
+			$Shape_normal.scale = _normal_shape_scale * pulse_scale
+			$Shape_big.scale = _big_shape_scale * pulse_scale
+		_:
+			modulate = REGULAR_COLOR
+			$Shape_normal.scale = _normal_shape_scale
+			$Shape_big.scale = _big_shape_scale
+
+
+func _start_lifetime_timer():
+
+	var timer := Timer.new()
+	timer.one_shot = true
+	timer.wait_time = get_lifetime_seconds()
+	timer.timeout.connect(_on_lifetime_timeout)
+	add_child(timer)
+	timer.start()
+	_lifetime_timer = timer
+
+
+func _setup_timeout_indicator():
+
+	var parent_shape := $Shape_big if food_size == FoodSize.BIG else $Shape_normal
+	var base_radius := 15.0 if food_size == FoodSize.BIG else 10.0
+
+	_timeout_indicator = VisibleCircleShape2D.new()
+	_timeout_indicator.radius = base_radius + TIMEOUT_RING_RADIUS_PADDING
+	_timeout_indicator.num_circle_segments = maxi(MIN_RING_SEGMENTS, roundi(_timeout_indicator.radius * RING_SEGMENTS_PER_RADIUS))
+	_timeout_indicator.start_angle = -90.0
+	_timeout_indicator.central_angle = 360.0
+	_timeout_indicator.border_width = TIMEOUT_RING_WIDTH
+	_timeout_indicator.enable_fill = false
+	_timeout_indicator.border_color = Color(1.0, 1.0, 1.0, 0.78)
+	parent_shape.add_child(_timeout_indicator)
+	_timeout_indicator.update_polygon_nodes()
+
+
+func _update_timeout_indicator():
+
+	if _timeout_indicator == null or _lifetime_timer == null:
+		return
+
+	var lifetime := get_lifetime_seconds()
+	if lifetime <= 0.0:
+		return
+
+	var remaining_ratio := clampf(_lifetime_timer.time_left / lifetime, 0.0, 1.0)
+	_timeout_indicator.central_angle = 360.0 * remaining_ratio
+	_timeout_indicator.border_color = Color(1.0, 1.0, 1.0, lerpf(0.2, 0.78, remaining_ratio))
+	_timeout_indicator.update_polygon_nodes()
+
+
+func _on_lifetime_timeout():
+
+	queue_free()
+
+
 func play_collection_effect(awarded_points: int):
 	"""Play particle effect when food is collected. Should be called before queue_free()."""
 
@@ -90,7 +217,7 @@ func play_collection_effect(awarded_points: int):
 	var particles := $CollectionParticles
 	particles.amount = int(60 * total_multiplier * lerpf(1.0, 2.4, award_intensity))
 	particles.scale = Vector2.ONE * (0.8 + (total_multiplier - 1.0) * 0.4 + award_intensity * 0.35)
-	particles.modulate = LOW_VALUE_PARTICLE_COLOR.lerp(HIGH_VALUE_PARTICLE_COLOR, award_intensity)
+	particles.modulate = _get_collection_particle_color(award_intensity)
 
 	if particles.process_material is ParticleProcessMaterial:
 		var mat := (particles.process_material as ParticleProcessMaterial).duplicate() as ParticleProcessMaterial
@@ -106,3 +233,11 @@ func play_collection_effect(awarded_points: int):
 
 	# Auto-cleanup after particles finish
 	particles.finished.connect(func(): particles.queue_free())
+
+
+func _get_collection_particle_color(award_intensity: float) -> Color:
+
+	if food_type == FoodType.GOLDEN:
+		return GOLDEN_COLOR.lerp(GOLDEN_PULSE_COLOR, award_intensity)
+
+	return LOW_VALUE_PARTICLE_COLOR.lerp(HIGH_VALUE_PARTICLE_COLOR, award_intensity)
