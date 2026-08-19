@@ -12,6 +12,7 @@ func _ready():
 	var score = Global.get_total_score()
 	var length = Global.get_total_score() - Global.get_total_bonus() + 1
 	HighScore.check_and_update_highscore(Global.difficulty, score, length)
+	$Button.call_deferred("grab_focus")
 	
 
 func _on_button_pressed():

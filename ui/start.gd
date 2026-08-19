@@ -4,6 +4,7 @@ extends ColorRect
 func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	update_highscore_display()
+	_focus_last_difficulty_button()
 
 
 func update_highscore_display():
@@ -36,6 +37,17 @@ func update_highscore_display():
 			]
 		else:
 			diff_data["node"].text = "%s: ---" % diff_data["name"]
+
+
+func _focus_last_difficulty_button():
+
+	var button: Button = $NormalButton
+	if Global.difficulty == Global.Difficulty.EASY:
+		button = $EasyButton
+	elif Global.difficulty == Global.Difficulty.HARD:
+		button = $HardButton
+
+	button.call_deferred("grab_focus")
 
 
 func _on_easy_button_pressed():
