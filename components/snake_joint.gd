@@ -3,7 +3,25 @@ extends DampedSpringJoint2D
 
 @onready var line := $Line as Line2D
 
+var show_detail_line := true:
+	set(value):
+		if show_detail_line == value:
+			return
+
+		show_detail_line = value
+		if is_node_ready():
+			line.visible = show_detail_line
+
+
+func _ready():
+
+	line.visible = show_detail_line
+
+
 func _process( _delta ):
+
+	if not show_detail_line:
+		return
 	
 	var node1 := get_node( node_a ) as Node2D
 	var node2 := get_node( node_b ) as Node2D

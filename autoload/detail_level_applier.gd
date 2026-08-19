@@ -9,6 +9,7 @@
 ## - Treat values below 1.0 as reduced polygon detail.
 ## - Regenerate visible geometry when the property changes.
 ## - Keep the setting visual-only; collision or gameplay behavior must not change.
+## - Snake joints may expose "show_detail_line"; it is disabled only on low detail.
 
 class_name DetailLevelApplier
 extends Node
@@ -24,6 +25,7 @@ const LOW_DETAIL_SCALE := 0.25
 
 var _global: Node = null
 var _current_scale := HIGH_DETAIL_SCALE
+var _current_level = SettingsManager.DetailLevel.HIGH
 
 
 ## Initializes the applier with the Global autoload node.
@@ -33,7 +35,8 @@ var _current_scale := HIGH_DETAIL_SCALE
 func initialize(global_node: Node):
 
 	_global = global_node
-	_current_scale = _get_scale_for_detail_level(_global.get_detail_level())
+	_current_level = _global.get_detail_level()
+	_current_scale = _get_scale_for_detail_level(_current_level)
 
 	if not _global.detail_level_changed.is_connected(_on_detail_level_changed):
 		_global.detail_level_changed.connect(_on_detail_level_changed)
@@ -46,6 +49,7 @@ func initialize(global_node: Node):
 
 func _on_detail_level_changed(level):
 
+	_current_level = level
 	_current_scale = _get_scale_for_detail_level(level)
 	_apply_to_tree(get_tree().root)
 
@@ -75,12 +79,24 @@ func _apply_to_node(node: Node):
 	if _has_polygon_detail_scale(node):
 		node.set("polygon_detail_scale", _current_scale)
 
+	if _has_show_detail_line(node):
+		node.set("show_detail_line", _current_level != SettingsManager.DetailLevel.LOW)
+
 
 ## Returns true when a node exposes the shared polygon detail API.
 func _has_polygon_detail_scale(node: Node) -> bool:
 
 	for property in node.get_property_list():
 		if property["name"] == "polygon_detail_scale":
+			return true
+
+	return false
+
+
+func _has_show_detail_line(node: Node) -> bool:
+
+	for property in node.get_property_list():
+		if property["name"] == "show_detail_line":
 			return true
 
 	return false
