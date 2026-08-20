@@ -1,11 +1,10 @@
-[gd_scene load_steps=10 format=3 uid="uid://c8j7mxxvdsagi"]
+[gd_scene load_steps=9 format=3 uid="uid://c8j7mxxvdsagi"]
 
 [ext_resource type="Script" uid="uid://crgklbpvv4f0l" path="res://components/snake_head.gd" id="1_mu00g"]
 [ext_resource type="Script" uid="uid://dpd1qp8ynkn5g" path="res://shapes/visible_circle_shape_2d.gd" id="2_qv0n0"]
 [ext_resource type="AudioStream" uid="uid://cmw7b1ptnb5kn" path="res://sounds/eat.wav" id="3_pldhu"]
 [ext_resource type="AudioStream" uid="uid://b6wkky0imim61" path="res://sounds/ouch.wav" id="4_ouch"]
 [ext_resource type="Script" path="res://components/snake_time_bonus_indicator.gd" id="5_bonus"]
-[ext_resource type="AudioStream" uid="uid://c8s161iw8acxl" path="res://sounds/golden_food.wav" id="5_golden"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_frictionless"]
 friction = 0.0
@@ -57,9 +56,6 @@ shape = SubResource("CircleShape2D_it4ar")
 
 [node name="EatSound" type="AudioStreamPlayer2D" parent="." unique_id=2088081507]
 stream = SubResource("AudioStreamRandomizer_wtblp")
-
-[node name="GoldenFoodSound" type="AudioStreamPlayer2D" parent="."]
-stream = ExtResource("5_golden")
 
 [node name="OuchSound" type="AudioStreamPlayer2D" parent="." unique_id=1451301148]
 stream = ExtResource("4_ouch")

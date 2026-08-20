@@ -1,14 +1,13 @@
 class_name Food
 extends RigidBody2D
 
+## Emitted when this food's behavior requests a named score stat update.
+signal food_score_stat_requested(label: String, value: int)
+
+
 enum FoodSize {
 	NORMAL,
 	BIG,
-}
-
-enum FoodType {
-	REGULAR,
-	GOLDEN,
 }
 
 const MAX_NUTRITION: int = 3
@@ -18,19 +17,12 @@ const MAX_COLLECTION_EFFECT_POINTS := 36.0
 const LOW_VALUE_PARTICLE_COLOR := Color(0.235294, 1.0, 0.0, 1.0)
 const HIGH_VALUE_PARTICLE_COLOR := Color(0.45, 1.0, 0.87, 1.0)
 const REGULAR_COLOR := Color(0.235294, 1.0, 0.0, 1.0)
-const GOLDEN_COLOR := Color(1.0, 0.78, 0.08, 1.0)
-const GOLDEN_PULSE_COLOR := Color(1.0, 0.95, 0.32, 1.0)
-const GOLDEN_LIFETIME_SECONDS := 6.0
-const GOLDEN_SCORE_MULTIPLIER := 3
-const GOLDEN_LENGTH_BONUS_SEGMENTS := 5
-const GOLDEN_PULSE_SPEED := 5.0
-const GOLDEN_PULSE_SCALE := 1.08
-const TIMEOUT_RING_RADIUS_PADDING := 4.0
-const TIMEOUT_RING_WIDTH := 2.5
+
+const DEFAULT_FOOD_KIND := preload("res://components/regular_food_definition.tres")
 
 @export var food_size: FoodSize = FoodSize.NORMAL
 @export var food_nutrition: int = 1
-@export var food_type: FoodType = FoodType.REGULAR
+@export var food_kind: Resource = null
 
 var show_detail_rings := true:
 	set(value):
@@ -41,11 +33,9 @@ var show_detail_rings := true:
 		_update_tail_count_ring_visibility()
 
 var _tail_count_rings: Array[Node2D] = []
-var _pulse_time := 0.0
 var _normal_shape_scale := Vector2.ONE
 var _big_shape_scale := Vector2.ONE
-var _lifetime_timer: Timer = null
-var _timeout_indicator: VisibleCircleShape2D = null
+var _kind_behavior: Node = null
 
 
 func _ready():
@@ -66,22 +56,13 @@ func _ready():
 			$CollisionShape_big.set_deferred("disabled", false )
 			_setup_tail_count_rings($Shape_big, 15.0)
 
-	_apply_food_type_visuals()
-	set_process(food_type == FoodType.GOLDEN)
-
-	if is_timed():
-		_setup_timeout_indicator()
-		_start_lifetime_timer()
+	_setup_kind_behavior()
 
 
 func _process(delta: float):
 
-	if food_type != FoodType.GOLDEN:
-		return
-
-	_pulse_time += delta * GOLDEN_PULSE_SPEED
-	_apply_food_type_visuals()
-	_update_timeout_indicator()
+	if _kind_behavior != null:
+		_kind_behavior.process_kind(delta)
 
 
 func _setup_tail_count_rings(parent_node: Node2D, base_radius: float):
@@ -118,91 +99,98 @@ func _update_tail_count_ring_visibility():
 			ring.visible = show_detail_rings
 
 
+## Returns this food kind's score multiplier.
+##
+## Food keeps size and nutrition separate; this value only represents the
+## behavior-specific multiplier applied by the current food kind.
 func get_score_multiplier(snake_length: int = 0) -> int:
 
-	match food_type:
-		FoodType.GOLDEN:
-			return GOLDEN_SCORE_MULTIPLIER + floori(float(snake_length) / GOLDEN_LENGTH_BONUS_SEGMENTS)
-		_:
-			return 1
+	if _kind_behavior == null:
+		return 1
+
+	return _kind_behavior.get_score_multiplier(snake_length)
 
 
-func is_timed() -> bool:
+## Runs kind-specific logic after this Food is added to the scene.
+func on_spawned(spawner: Node):
 
-	return food_type == FoodType.GOLDEN
-
-
-func get_lifetime_seconds() -> float:
-
-	match food_type:
-		FoodType.GOLDEN:
-			return GOLDEN_LIFETIME_SECONDS
-		_:
-			return 0.0
+	if _kind_behavior != null:
+		_kind_behavior.on_spawned(spawner)
 
 
-func _apply_food_type_visuals():
+## Attempts to play this food kind's collection sound.
+##
+## Returns true when a kind-specific sound was played. Callers should play their
+## default collection sound when this returns false.
+func play_collection_sound(collector: Node, awarded_points: int) -> bool:
 
-	match food_type:
-		FoodType.GOLDEN:
-			var pulse := (sin(_pulse_time) + 1.0) * 0.5
-			modulate = GOLDEN_COLOR.lerp(GOLDEN_PULSE_COLOR, pulse)
+	if _kind_behavior == null:
+		return false
 
-			var pulse_scale := lerpf(1.0, GOLDEN_PULSE_SCALE, pulse)
-			$Shape_normal.scale = _normal_shape_scale * pulse_scale
-			$Shape_big.scale = _big_shape_scale * pulse_scale
-		_:
-			modulate = REGULAR_COLOR
-			$Shape_normal.scale = _normal_shape_scale
-			$Shape_big.scale = _big_shape_scale
+	return _kind_behavior.play_collection_sound(collector, awarded_points)
 
 
-func _start_lifetime_timer():
+## Applies this food kind's collection stat side effects.
+func apply_collection_stats(awarded_points: int):
 
-	var timer := Timer.new()
-	timer.one_shot = true
-	timer.wait_time = get_lifetime_seconds()
-	timer.timeout.connect(_on_lifetime_timeout)
-	add_child(timer)
-	timer.start()
-	_lifetime_timer = timer
+	if _kind_behavior != null:
+		_kind_behavior.apply_collection_stats(awarded_points)
 
 
-func _setup_timeout_indicator():
+## Restores both authored shape scales.
+##
+## Food kind behaviors call this when they need to clear temporary visual scale
+## changes without knowing which size is currently active.
+func reset_shape_scales():
 
-	var parent_shape := $Shape_big if food_size == FoodSize.BIG else $Shape_normal
-	var base_radius := 15.0 if food_size == FoodSize.BIG else 10.0
-
-	_timeout_indicator = VisibleCircleShape2D.new()
-	_timeout_indicator.radius = base_radius + TIMEOUT_RING_RADIUS_PADDING
-	_timeout_indicator.num_circle_segments = maxi(MIN_RING_SEGMENTS, roundi(_timeout_indicator.radius * RING_SEGMENTS_PER_RADIUS))
-	_timeout_indicator.start_angle = -90.0
-	_timeout_indicator.central_angle = 360.0
-	_timeout_indicator.border_width = TIMEOUT_RING_WIDTH
-	_timeout_indicator.enable_fill = false
-	_timeout_indicator.border_color = Color(1.0, 1.0, 1.0, 0.78)
-	parent_shape.add_child(_timeout_indicator)
-	_timeout_indicator.update_polygon_nodes()
+	$Shape_normal.scale = _normal_shape_scale
+	$Shape_big.scale = _big_shape_scale
 
 
-func _update_timeout_indicator():
+## Applies a temporary scale multiplier to both authored shape variants.
+##
+## Both shapes are updated so size changes remain correct if Food setup toggles
+## which shape is visible.
+func apply_shape_pulse_scale(pulse_scale: float):
 
-	if _timeout_indicator == null or _lifetime_timer == null:
-		return
-
-	var lifetime := get_lifetime_seconds()
-	if lifetime <= 0.0:
-		return
-
-	var remaining_ratio := clampf(_lifetime_timer.time_left / lifetime, 0.0, 1.0)
-	_timeout_indicator.central_angle = 360.0 * remaining_ratio
-	_timeout_indicator.border_color = Color(1.0, 1.0, 1.0, lerpf(0.2, 0.78, remaining_ratio))
-	_timeout_indicator.update_polygon_nodes()
+	$Shape_normal.scale = _normal_shape_scale * pulse_scale
+	$Shape_big.scale = _big_shape_scale * pulse_scale
 
 
-func _on_lifetime_timeout():
+## Returns the visible shape node for the current food size.
+##
+## Food kind behaviors use this to attach size-aware visual children.
+func get_active_shape_node() -> Node2D:
 
-	queue_free()
+	return $Shape_big if food_size == FoodSize.BIG else $Shape_normal
+
+
+## Returns the authored radius for the current food size.
+##
+## Food kind behaviors use this to place size-aware visual elements.
+func get_active_base_radius() -> float:
+
+	return 15.0 if food_size == FoodSize.BIG else 10.0
+
+
+## Creates and initializes the behavior component selected by food_kind.
+##
+## Regular food is used as a defensive fallback when no definition is assigned.
+func _setup_kind_behavior():
+
+	if food_kind == null:
+		food_kind = DEFAULT_FOOD_KIND
+
+	_kind_behavior = food_kind.call("create_behavior") as Node
+	add_child(_kind_behavior)
+	if _kind_behavior.has_signal("food_score_stat_requested"):
+		_kind_behavior.food_score_stat_requested.connect(_on_food_score_stat_requested)
+	_kind_behavior.setup(self)
+
+
+func _on_food_score_stat_requested(label: String, value: int):
+
+	food_score_stat_requested.emit(label, value)
 
 
 func play_collection_effect(awarded_points: int):
@@ -217,7 +205,10 @@ func play_collection_effect(awarded_points: int):
 	var particles := $CollectionParticles
 	particles.amount = int(60 * total_multiplier * lerpf(1.0, 2.4, award_intensity))
 	particles.scale = Vector2.ONE * (0.8 + (total_multiplier - 1.0) * 0.4 + award_intensity * 0.35)
-	particles.modulate = _get_collection_particle_color(award_intensity)
+	if _kind_behavior != null:
+		particles.modulate = _kind_behavior.get_collection_particle_color(award_intensity)
+	else:
+		particles.modulate = LOW_VALUE_PARTICLE_COLOR.lerp(HIGH_VALUE_PARTICLE_COLOR, award_intensity)
 
 	if particles.process_material is ParticleProcessMaterial:
 		var mat := (particles.process_material as ParticleProcessMaterial).duplicate() as ParticleProcessMaterial
@@ -233,11 +224,3 @@ func play_collection_effect(awarded_points: int):
 
 	# Auto-cleanup after particles finish
 	particles.finished.connect(func(): particles.queue_free())
-
-
-func _get_collection_particle_color(award_intensity: float) -> Color:
-
-	if food_type == FoodType.GOLDEN:
-		return GOLDEN_COLOR.lerp(GOLDEN_PULSE_COLOR, award_intensity)
-
-	return LOW_VALUE_PARTICLE_COLOR.lerp(HIGH_VALUE_PARTICLE_COLOR, award_intensity)

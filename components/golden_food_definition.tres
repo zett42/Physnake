@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="FoodKindDefinition" format=3 uid="uid://dkw5vnr31q3ud"]
+
+[ext_resource type="Script" path="res://components/food_kind_definition.gd" id="1_definition"]
+[ext_resource type="Script" path="res://components/golden_food_behavior.gd" id="2_behavior"]
+
+[resource]
+script = ExtResource("1_definition")
+spawn_weight = 0.075
+behavior_script = ExtResource("2_behavior")

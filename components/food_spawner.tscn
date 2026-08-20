@@ -1,12 +1,14 @@
-[gd_scene load_steps=5 format=3 uid="uid://df45hl5y4bimn"]
+[gd_scene load_steps=6 format=3 uid="uid://df45hl5y4bimn"]
 
 [ext_resource type="Script" path="res://components/food_spawner.gd" id="1_i321b"]
 [ext_resource type="Shape2D" uid="uid://byqfqg6j24gi7" path="res://components/food_collision_shape_normal.tres" id="2_eyq35"]
 [ext_resource type="Shape2D" uid="uid://b0xy0u51igvte" path="res://components/food_collision_shape_big.tres" id="3_pucsy"]
-[ext_resource type="AudioStream" uid="uid://b4da1r7sautqh" path="res://sounds/golden_spawn.wav" id="4_spawn"]
+[ext_resource type="Resource" uid="uid://c1nmf0rqks7y0" path="res://components/regular_food_definition.tres" id="4_regular"]
+[ext_resource type="Resource" uid="uid://dkw5vnr31q3ud" path="res://components/golden_food_definition.tres" id="5_golden"]
 
 [node name="FoodSpawner" type="Node"]
 script = ExtResource("1_i321b")
+food_kinds = Array[Resource]([ExtResource("4_regular"), ExtResource("5_golden")])
 
 [node name="ShapeCast_normal" type="ShapeCast2D" parent="."]
 shape = ExtResource("2_eyq35")
@@ -17,7 +19,3 @@ max_results = 1
 shape = ExtResource("3_pucsy")
 target_position = Vector2(0, 0)
 max_results = 1
-
-[node name="GoldenSpawnSound" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("4_spawn")
-volume_db = -2.0

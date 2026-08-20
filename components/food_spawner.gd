@@ -1,18 +1,18 @@
 extends Node
 
 const food_scene = preload("res://components/food.tscn")
+const DEFAULT_FOOD_KIND := preload("res://components/regular_food_definition.tres")
 
 # Propability that big food is spawned (0..1)
 const BIG_FOOD_PROPABILITY: float = 0.1
-const GOLDEN_FOOD_PROBABILITY: float = 0.075
 
 
 @export var food_count: int = 25
+@export var food_kinds: Array[Resource] = []
 
 
 @onready var _shape_cast_normal := $ShapeCast_normal as ShapeCast2D
 @onready var _shape_cast_big    := $ShapeCast_big as ShapeCast2D
-@onready var _golden_spawn_sound := $GoldenSpawnSound as AudioStreamPlayer
 
 
 func _process( _delta ):
@@ -30,7 +30,7 @@ func _process( _delta ):
 func _spawn_food():
 	
 	var food_size = Food.FoodSize.NORMAL if randf() > BIG_FOOD_PROPABILITY else Food.FoodSize.BIG
-	var food_type = Food.FoodType.GOLDEN if randf() < GOLDEN_FOOD_PROBABILITY else Food.FoodType.REGULAR
+	var food_kind := _pick_food_kind()
 
 	# Try to find an unoccluded location for spawning food.
 	
@@ -48,10 +48,40 @@ func _spawn_food():
 			var food = food_scene.instantiate()
 			food.position = shape_cast.position
 			food.food_size = food_size
-			food.food_type = food_type
+			food.food_kind = food_kind
 			food.food_nutrition = randi_range(1, Food.MAX_NUTRITION)
 		
-			get_parent().add_child( food )	
-			if food_type == Food.FoodType.GOLDEN:
-				_golden_spawn_sound.play()
+			get_parent().add_child( food )
+			food.on_spawned(self)
 			break
+
+
+func _pick_food_kind() -> Resource:
+
+	var available_kinds := _get_food_kinds()
+	var total_weight := 0.0
+	for food_kind in available_kinds:
+		if food_kind != null:
+			total_weight += maxf(float(food_kind.get("spawn_weight")), 0.0)
+
+	if total_weight <= 0.0:
+		return DEFAULT_FOOD_KIND
+
+	var selected_weight := randf() * total_weight
+	for food_kind in available_kinds:
+		if food_kind == null:
+			continue
+
+		selected_weight -= maxf(float(food_kind.get("spawn_weight")), 0.0)
+		if selected_weight <= 0.0:
+			return food_kind
+
+	return available_kinds.back()
+
+
+func _get_food_kinds() -> Array[Resource]:
+
+	if not food_kinds.is_empty():
+		return food_kinds
+
+	return [DEFAULT_FOOD_KIND]

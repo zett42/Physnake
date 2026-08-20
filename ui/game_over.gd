@@ -4,7 +4,7 @@ func _ready():
 
 	$Score.text = "total score: %d" % Global.get_total_score()
 	$Bonus.text = "bonus score: %d" % Global.get_total_bonus()
-	$GoldenScore.text = "golden food score: %d" % Global.get_total_golden_score()
+	_populate_food_stats()
 	$SnakeLength.text = "snake length: %d" % (Global.get_total_score() - Global.get_total_bonus() + 1)
 	$AvgSpeed.text = "avg speed: %.0f" % Global.get_average_speed()
 	$Difficulty.text = "difficulty: %s" % Global.get_difficulty_name(Global.difficulty)
@@ -26,3 +26,13 @@ func _on_button_pressed():
 
 	# Remove the game over screen
 	queue_free()
+
+
+func _populate_food_stats():
+
+	for stat in Global.get_food_score_stats():
+		var label := Label.new()
+		label.add_theme_font_size_override("font_size", 35)
+		label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		label.text = "%s: %d" % [stat["label"], stat["value"]]
+		$FoodStats.add_child(label)

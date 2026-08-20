@@ -79,7 +79,7 @@ theme_override_font_sizes/font_size = 35
 text = "snake length:"
 horizontal_alignment = 1
 
-[node name="GoldenScore" type="Label" parent="." unique_id=1417573369]
+[node name="FoodStats" type="VBoxContainer" parent="." unique_id=1417573369]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -92,9 +92,7 @@ offset_right = 283.0
 offset_bottom = 42.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_font_sizes/font_size = 35
-text = "golden food score:"
-horizontal_alignment = 1
+theme_override_constants/separation = 0
 
 [node name="AvgSpeed" type="Label" parent="." unique_id=1091501684]
 layout_mode = 1

@@ -15,8 +15,6 @@ const TIME_BONUS_DURATION: float = 3.0
 const MAX_FOOD_AWARD_POINTS := 36.0
 const EAT_SOUND_MIN_VOLUME_DB := -5.0
 const EAT_SOUND_MAX_VOLUME_DB := 5.0
-const GOLDEN_FOOD_SOUND_MIN_VOLUME_DB := -2.0
-const GOLDEN_FOOD_SOUND_MAX_VOLUME_DB := 6.0
 
 # Joint length constants
 const JOINT_BASE_REST_LENGTH: float = 25.0  # Base rest length from joint scene
@@ -358,14 +356,14 @@ func _on_body_entered( body: Node ):
 
 		# Calculate score before triggering the effect so particles can reflect the awarded value.
 		var food_size_multiplier = 2.0 if body.food_size == Food.FoodSize.BIG else 1.0
-		var is_golden_food: bool = body.food_type == Food.FoodType.GOLDEN
 		var snake_length := controller.get_segment_count() if controller != null else 0
 		var base_score = int(body.food_nutrition * food_size_multiplier * body.get_score_multiplier(snake_length))
 		var bonus_score = ceili( time_bonus ) * base_score
 		var awarded_points = base_score + bonus_score
 
 		_spawn_score_popup( awarded_points )
-		_play_eat_sound( awarded_points, is_golden_food )
+		if not body.play_collection_sound(self, awarded_points):
+			_play_eat_sound( awarded_points )
 
 		# Trigger food's collection effect before removing it
 		body.play_collection_effect( awarded_points )
@@ -379,23 +377,24 @@ func _on_body_entered( body: Node ):
 		# update score
 		Global.add_score( base_score )
 		Global.add_bonus( bonus_score )
-		if is_golden_food:
-			Global.add_golden_score( awarded_points )
+		if body.has_signal("food_score_stat_requested"):
+			body.connect("food_score_stat_requested", _on_food_score_stat_requested)
+		body.apply_collection_stats( awarded_points )
 		
 		time_bonus = MAX_TIME_BONUS
 		time_bonus_indicator.set_bonus_segments(controller.segments, time_bonus)
 
 
-func _play_eat_sound(awarded_points: int, is_golden_food: bool = false):
+func _play_eat_sound(awarded_points: int):
 
 	var award_intensity := clampf(float(awarded_points) / MAX_FOOD_AWARD_POINTS, 0.0, 1.0)
-	if is_golden_food:
-		$GoldenFoodSound.volume_db = lerpf(GOLDEN_FOOD_SOUND_MIN_VOLUME_DB, GOLDEN_FOOD_SOUND_MAX_VOLUME_DB, award_intensity)
-		$GoldenFoodSound.play()
-		return
-
 	$EatSound.volume_db = lerpf(EAT_SOUND_MIN_VOLUME_DB, EAT_SOUND_MAX_VOLUME_DB, award_intensity)
 	$EatSound.play()
+
+
+func _on_food_score_stat_requested(label: String, value: int):
+
+	Global.add_food_score_stat(label, value)
 
 
 func _spawn_score_popup(awarded_points: int):

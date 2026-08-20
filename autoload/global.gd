@@ -24,12 +24,13 @@ enum Difficulty {
 
 var total_score: int = 0
 var total_bonus: int = 0
-var total_golden_score: int = 0
 var total_head_distance: float = 0.0
 var play_time: float = 0.0
 
 var _is_game_over: bool = false
 var _detail_level_applier := DetailLevelApplier.new()
+var _food_score_stats: Dictionary = {}
+var _food_score_stat_order: Array[String] = []
 var settings := SettingsManager.new()
 
 
@@ -56,7 +57,8 @@ func reset_game_state():
 	_is_game_over = false
 	total_score = 0
 	total_bonus = 0
-	total_golden_score = 0
+	_food_score_stats.clear()
+	_food_score_stat_order.clear()
 	total_head_distance = 0.0
 	play_time = 0.0
 	update_speed_display()
@@ -70,11 +72,6 @@ func get_total_score():
 func get_total_bonus():
 
 	return total_bonus
-
-
-func get_total_golden_score():
-
-	return total_golden_score
 
 
 func get_total_head_distance() -> float:
@@ -125,9 +122,28 @@ func add_bonus( value: int ):
 	update_score_display()
 
 
-func add_golden_score( value: int ):
+func add_food_score_stat(label: String, value: int):
 
-	total_golden_score += value
+	if label.is_empty():
+		return
+
+	if not _food_score_stats.has(label):
+		_food_score_stats[label] = 0
+		_food_score_stat_order.append(label)
+
+	_food_score_stats[label] += value
+
+
+func get_food_score_stats() -> Array[Dictionary]:
+
+	var stats: Array[Dictionary] = []
+	for label in _food_score_stat_order:
+		stats.append({
+			"label": label,
+			"value": _food_score_stats[label],
+		})
+
+	return stats
 
 
 func update_score_display():
